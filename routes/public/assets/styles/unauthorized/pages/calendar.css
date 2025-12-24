@@ -1,0 +1,15 @@
+/* Available events (duration_state: 1) */
+.fc-event-available,
+.fc-event-available .fc-event-main {
+    background-color: #28a745 !important; /* Green for available */
+    border-color: #28a745 !important;
+    color: #fff !important; /* White text for contrast */
+}
+
+/* Unavailable events (duration_state: 0) */
+.fc-event-unavailable,
+.fc-event-unavailable .fc-event-main {
+    background-color: #dc3545 !important; /* Red for unavailable */
+    border-color: #dc3545 !important;
+    color: #fff !important; /* White text for contrast */
+}
