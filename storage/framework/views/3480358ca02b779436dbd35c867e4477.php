@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>Register - Health Staff</title>
 
     <!-- Fonts -->
@@ -248,70 +248,113 @@
         </div>
 
         <!-- Error Messages -->
-        @if ($errors->any())
+        <?php if($errors->any()): ?>
             <div class="alert alert-danger">
                 <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>
-        @endif
+        <?php endif; ?>
 
-        @if (session('error'))
+        <?php if(session('error')): ?>
             <div class="alert alert-danger">
-                {{ session('error') }}
+                <?php echo e(session('error')); ?>
+
             </div>
-        @endif
+        <?php endif; ?>
 
         <!-- Registration Form -->
-        <form action="{{ route('health-staff.register') }}" method="POST" id="registrationForm">
-            @csrf
+        <form action="<?php echo e(route('health-staff.register')); ?>" method="POST" id="registrationForm">
+            <?php echo csrf_field(); ?>
 
             <!-- Email -->
             <div class="form-group">
                 <label for="email" class="required">Email</label>
                 <input type="email"
-                       class="form-control @error('email') is-invalid @enderror"
+                       class="form-control <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                        id="email"
                        name="email"
-                       value="{{ old('email') }}"
+                       value="<?php echo e(old('email')); ?>"
                        placeholder="your.email@example.com"
                        required>
-                @error('email')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
             <!-- Username -->
             <div class="form-group">
                 <label for="username" class="required">Username</label>
                 <input type="text"
-                       class="form-control @error('username') is-invalid @enderror"
+                       class="form-control <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                        id="username"
                        name="username"
-                       value="{{ old('username') }}"
+                       value="<?php echo e(old('username')); ?>"
                        placeholder="Choose a unique username"
                        required>
                 <div class="password-hint">Will be used for login</div>
-                @error('username')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
             <!-- Password -->
             <div class="form-group">
                 <label for="password" class="required">Password</label>
                 <input type="password"
-                       class="form-control @error('password') is-invalid @enderror"
+                       class="form-control <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                        id="password"
                        name="password"
                        placeholder="Enter a strong password"
                        required>
                 <div class="password-hint">Must be at least 8 characters</div>
-                @error('password')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
             <!-- Confirm Password -->
@@ -328,20 +371,35 @@
             <!-- Staff Type -->
             <div class="form-group">
                 <label for="human_type" class="required">Staff Type</label>
-                <select class="form-control @error('human_type') is-invalid @enderror"
+                <select class="form-control <?php $__errorArgs = ['human_type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                         id="human_type"
                         name="human_type"
                         required>
                     <option value="">Select your staff type</option>
-                    @foreach($humanTypes as $type)
-                        <option value="{{ $type->id }}" {{ old('human_type') == $type->id ? 'selected' : '' }}>
-                            {{ $type->name }}
+                    <?php $__currentLoopData = $humanTypes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($type->id); ?>" <?php echo e(old('human_type') == $type->id ? 'selected' : ''); ?>>
+                            <?php echo e($type->name); ?>
+
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
-                @error('human_type')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <?php $__errorArgs = ['human_type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="invalid-feedback"><?php echo e($message); ?></div>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
             <!-- Submit Button -->
@@ -354,7 +412,7 @@
         <div class="login-link">
             <p style="margin: 0; color: #64748b;">
                 Already have an account?
-                <a href="{{ route('login') }}" style="color: #667eea; text-decoration: none;">
+                <a href="<?php echo e(route('login')); ?>" style="color: #667eea; text-decoration: none;">
                     Sign In
                 </a>
             </p>
@@ -399,3 +457,4 @@
 </script>
 </body>
 </html>
+<?php /**PATH D:\work\laragon\www\delegation\resources\views/health-staff/register.blade.php ENDPATH**/ ?>

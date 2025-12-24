@@ -206,7 +206,7 @@
             </div>
 
             <!-- Application Form -->
-            <form class="form" action="<?php echo e(route('application.update', $application->id)); ?>" method="POST" id="apply_mission_form" enctype="multipart/form-data">
+            <form class="form" action="/apply_to_mission" method="POST" id="apply_mission_form" enctype="multipart/form-data">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="mission_id" value="<?php echo e($mission->id); ?>"/>
 
@@ -217,18 +217,27 @@
                     <div class="row">
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Would you like to apply for this mission as</label>
-                            <select class="form-select form-select-solid" name="human_type" id="human_type" data-control="select2" data-placeholder="Select Your Role">
-                                <option value="" disabled>Select Your Role</option>
+                            <select class="form-select form-select-solid" name="human_type" id="human_type" data-control="select2" data-placeholder="Select Your Role" disabled>
+                                <?php
+                                    // Get user's health staff type from their registration
+                                    $userHealthStaff = \App\Models\HealthStaff::where('user_id', Auth::id())->first();
+                                    $userHumanTypeId = $userHealthStaff ? $userHealthStaff->human_type_id : null;
+                                ?>
                                 <?php $__currentLoopData = $humanTypes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($type->id); ?>" <?php echo e($application->human_type_id == $type->id ? 'selected' : ''); ?>><?php echo e($type->name); ?></option>
+                                    <option value="<?php echo e($type->id); ?>" <?php echo e($userHumanTypeId == $type->id ? 'selected' : ''); ?>>
+                                        <?php echo e($type->name); ?>
+
+                                    </option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
+                            <!-- Hidden input to send the value since disabled fields don't submit -->
+                            <input type="hidden" name="human_type" value="<?php echo e($userHumanTypeId); ?>">
                         </div>
 
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Select Your Specialization</label>
                             <select class="form-select form-select-solid" name="specialization" id="specialization" data-control="select2" data-placeholder="Select Your Specialization">
-                                <option value="<?php echo e($application->specialization_id); ?>" selected><?php echo e($application->specialization->name ?? 'Select Your Specialization'); ?></option>
+                                <option value="" disabled selected>Select Your Specialization</option>
                             </select>
                         </div>
                     </div>
@@ -236,7 +245,7 @@
                     <div class="row">
                         <div class="col-md-12 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Full Name</label>
-                            <input type="text" class="form-control form-control-solid" placeholder="Full Name" id="full_name" name="full_name" value="<?php echo e($application->full_name); ?>"/>
+                            <input type="text" class="form-control form-control-solid" placeholder="Full Name" id="full_name" name="full_name"/>
                         </div>
                     </div>
 
@@ -245,8 +254,8 @@
                             <label class="fs-6 fw-semibold required mb-2">Gender</label>
                             <select class="form-select form-select-solid" name="gender" id="gender" data-control="select2" data-placeholder="Select an option">
                                 <option></option>
-                                <option value="1" <?php echo e($application->gender == 1 ? 'selected' : ''); ?>>Male</option>
-                                <option value="2" <?php echo e($application->gender == 2 ? 'selected' : ''); ?>>Female</option>
+                                <option value="1">Male</option>
+                                <option value="2">Female</option>
                             </select>
                         </div>
 
@@ -553,79 +562,24 @@
     <script src="<?php echo e(asset('assets/plugins/global/plugins.bundle.js')); ?>"></script>
     <script src="<?php echo e(asset('assets/plugins/custom/formrepeater/formrepeater.bundle.js')); ?>"></script>
     <script src="<?php echo e(asset('assets/javascript/unauthorized/pages/apply-mission.js')); ?>"></script>
-    
+
     <script>
-    // Pre-fill form with existing application data
-    $(document).ready(function() {
-        // Pre-fill all text inputs and textareas
-        const applicationData = <?php echo json_encode($application, 15, 512) ?>;
-        
-        // Basic fields
-        $('#full_name').val(applicationData.full_name);
-        $('#birth_date').val(applicationData.birth_date);
-        $('#nationality').val(applicationData.nationality);
-        $('#phone').val(applicationData.phone);
-        $('#email').val(applicationData.email);
-        
-        // Education
-        $('#highest_qualification').val(applicationData.highest_qualification);
-        $('#granting_university').val(applicationData.granting_university);
-        $('#degree_granting_country').val(applicationData.degree_granting_country);
-        $('#date_of_graduation').val(applicationData.date_of_graduation);
-        
-        // Experience
-        $('#clinical_experience_years').val(applicationData.clinical_experience_years);
-        $('#countries_previously_served').val(applicationData.countries_previously_served);
-        $('#previous_employers').val(applicationData.previous_employers);
-        
-        // Radio buttons - disaster experience
-        if(applicationData.disaster_experience === 'yes') {
-            $('#disaster_experience_yes').prop('checked', true);
-            $('#disaster_experience_description').val(applicationData.disaster_experience_description);
-            $('#disaster_experience_description_row').show();
-        } else {
-            $('#disaster_experience_no').prop('checked', true);
-        }
-        
-        // Radio buttons - volunteer experience
-        if(applicationData.volunteer_experience === 'yes') {
-            $('#volunteer_experience_yes').prop('checked', true);
-            $('#volunteer_experience_description').val(applicationData.volunteer_experience_description);
-            $('#volunteer_experience_description_row').show();
-        } else {
-            $('#volunteer_experience_no').prop('checked', true);
-        }
-        
-        // Radio buttons - visited gaza
-        if(applicationData.visited_gaza === 'yes') {
-            $('#visited_gaza_yes').prop('checked', true);
-        } else {
-            $('#visited_gaza_no').prop('checked', true);
-        }
-        
-        $('#place_of_work_previous_visit').val(applicationData.place_of_work_previous_visit);
-        
-        // Academic contributions
-        $('#educational_contributions').val(applicationData.educational_contributions);
-        $('#published_scientific_papers').val(applicationData.published_scientific_papers);
-        $('#conference_participation').val(applicationData.conference_participation);
-        
-        // Languages - pre-select
-        <?php if($application->languages && $application->languages->count() > 0): ?>
-        const selectedLanguages = <?php echo json_encode($application->languages->pluck('id'), 15, 512) ?>;
-        $('#languages_spoken').val(selectedLanguages).trigger('change');
-        <?php endif; ?>
-        
-        // Update button text
-        $('#submit_btn .indicator-label').text('Update Application');
-        
-        // Change form title
-        $('.mission-info-card h2').after('<p class="text-white mt-2"><i class="ki-outline ki-information fs-4"></i> You are editing your existing application</p>');
-        
-        // Update back button
-        $('a[href="/calendar"]').attr('href', '<?php echo e(route("application.view", $application->id)); ?>').html('<i class="ki-duotone ki-arrow-left fs-3"><span class="path1"></span><span class="path2"></span></i> Back to Application');
-    });
+        // Auto-load specializations based on user's role
+        $(document).ready(function() {
+            <?php
+                $userHealthStaff = \App\Models\HealthStaff::where('user_id', Auth::id())->first();
+                $userHumanTypeId = $userHealthStaff ? $userHealthStaff->human_type_id : null;
+            ?>
+
+            <?php if($userHumanTypeId): ?>
+            // Trigger specialization loading immediately
+            setTimeout(function() {
+                $('#human_type').val('<?php echo e($userHumanTypeId); ?>').trigger('change');
+                console.log('Auto-loaded specializations for role: <?php echo e($userHumanTypeId); ?>');
+            }, 500);
+            <?php endif; ?>
+        });
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('unauthorized.index', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/unauthorized/pages/edit-application.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('unauthorized.index', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/unauthorized/pages/apply-mission.blade.php ENDPATH**/ ?>

@@ -218,12 +218,20 @@
                     <div class="row">
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Would you like to apply for this mission as</label>
-                            <select class="form-select form-select-solid" name="human_type" id="human_type" data-control="select2" data-placeholder="Select Your Role">
-                                <option value="" disabled selected>Select Your Role</option>
+                            <select class="form-select form-select-solid" name="human_type" id="human_type" data-control="select2" data-placeholder="Select Your Role" disabled>
+                                @php
+                                    // Get user's health staff type from their registration
+                                    $userHealthStaff = \App\Models\HealthStaff::where('user_id', Auth::id())->first();
+                                    $userHumanTypeId = $userHealthStaff ? $userHealthStaff->human_type_id : null;
+                                @endphp
                                 @foreach ($humanTypes as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    <option value="{{ $type->id }}" {{ $userHumanTypeId == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name }}
+                                    </option>
                                 @endforeach
                             </select>
+                            <!-- Hidden input to send the value since disabled fields don't submit -->
+                            <input type="hidden" name="human_type" value="{{ $userHumanTypeId }}">
                         </div>
 
                         <div class="col-md-6 mb-7">
@@ -554,4 +562,22 @@
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/plugins/custom/formrepeater/formrepeater.bundle.js') }}"></script>
     <script src="{{ asset('assets/javascript/unauthorized/pages/apply-mission.js') }}"></script>
+
+    <script>
+        // Auto-load specializations based on user's role
+        $(document).ready(function() {
+            @php
+                $userHealthStaff = \App\Models\HealthStaff::where('user_id', Auth::id())->first();
+                $userHumanTypeId = $userHealthStaff ? $userHealthStaff->human_type_id : null;
+            @endphp
+
+            @if($userHumanTypeId)
+            // Trigger specialization loading immediately
+            setTimeout(function() {
+                $('#human_type').val('{{ $userHumanTypeId }}').trigger('change');
+                console.log('Auto-loaded specializations for role: {{ $userHumanTypeId }}');
+            }, 500);
+            @endif
+        });
+    </script>
 @endsection

@@ -22,24 +22,24 @@ Route::post('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/', [TaskController::class, 'index'])->middleware(['auth', 'verified']); // for task listing
-Route::get('/home', function() { return redirect('/calendar'); }); // redirect to calendar
-Route::get('/calendar', [MainController::class, 'index'])->name('calendar'); // calendar page
-Route::get('/apply-mission/{id}',  [MainController::class, 'showApplyPage'])->name('apply.mission.show');
-Route::get('/publish_tasks', [MainController::class, 'getPublishTasks'])->name('home.publish_tasks');
+Route::get('/home', function() { return redirect('/calendar'); })->middleware('auth'); // redirect to calendar
+Route::get('/calendar', [MainController::class, 'index'])->name('calendar')->middleware('auth'); // calendar page
+Route::get('/apply-mission/{id}',  [MainController::class, 'showApplyPage'])->name('apply.mission.show')->middleware('auth');
+Route::get('/publish_tasks', [MainController::class, 'getPublishTasks'])->name('home.publish_tasks')->middleware('auth');
 Route::get('/application/success/{id}', [MainController::class, 'applicationSuccess'])
-    ->name('application.success');
+    ->name('application.success')->middleware('auth');
 Route::get('/application/view/{id}', [MainController::class, 'viewApplication'])
-    ->name('application.view');
+    ->name('application.view')->middleware('auth');
 Route::get('/application/edit/{id}', [MainController::class, 'editApplication'])
-    ->name('application.edit');
+    ->name('application.edit')->middleware('auth');
 Route::post('/application/update/{id}', [MainController::class, 'updateApplication'])
-    ->name('application.update');
+    ->name('application.update')->middleware('auth');
 Route::delete('/application/file/{fileId}', [MainController::class, 'deleteApplicationFile'])
-    ->name('application.file.delete');
+    ->name('application.file.delete')->middleware('auth');
 //Route::post('/apply_to_mission', [MainController::class, 'applyToMission'])->name('apply_to_mission');
-Route::post('/get_specialization', [MainController::class, 'get_specialization']);
+Route::post('/get_specialization', [MainController::class, 'get_specialization'])->middleware('auth');
 
-Route::post('/apply_to_mission', [MainController::class, 'applyToMission'])->name('apply.mission');
+Route::post('/apply_to_mission', [MainController::class, 'applyToMission'])->name('apply.mission')->middleware('auth');
 
 
 Route::middleware('auth')->group(function () {
