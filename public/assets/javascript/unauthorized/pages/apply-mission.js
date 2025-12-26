@@ -7,12 +7,6 @@ var KTApplyMission = function () {
     const initializeSelect2 = () => {
         console.log('Initializing Select2...');
 
-        // Human Type
-        $('#human_type').select2({
-            placeholder: "Select Your Role",
-            allowClear: true
-        });
-
         // Specialization
         $('#specialization').select2({
             placeholder: "Select Your Specialization",
@@ -41,82 +35,77 @@ var KTApplyMission = function () {
         console.log('Select2 initialized successfully');
     };
 
-    // Handle human type change to load specializations
-    const handleHumanTypeChange = () => {
-        $('#human_type').on('change', function() {
-            var humanTypeId = $(this).val();
-            var $specSelect = $('#specialization');
+    // Auto-load specializations based on user's role
+    const loadSpecializationsOnInit = () => {
+        var humanTypeId = $('#human_type').val();
 
-            console.log('Human type changed:', humanTypeId);
+        console.log('Auto-loading specializations for role:', humanTypeId);
 
-            if (humanTypeId) {
-                $.ajax({
-                    url: '/get_specialization',
-                    type: 'POST',
-                    data: {
-                        HUMAN_TYPE: humanTypeId,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    dataType: 'json',
-                    beforeSend: function() {
-                        $specSelect.prop('disabled', true);
-                        $specSelect.next('.spinner-border').remove();
-                        $specSelect.parent().append('<span class="spinner-border spinner-border-sm align-middle ms-2"></span>');
-                    },
-                    success: function(response) {
-                        $specSelect.prop('disabled', false);
-                        $('.spinner-border').remove();
+        if (humanTypeId) {
+            loadSpecializations(humanTypeId);
+        }
+    };
 
-                        console.log('Specialization response:', response);
+    // Load specializations for given human type
+    const loadSpecializations = (humanTypeId) => {
+        var $specSelect = $('#specialization');
 
-                        if (response.status === 'success' && response.data && response.data.length > 0) {
-                            $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>');
+        console.log('Loading specializations for human_type:', humanTypeId);
 
-                            $.each(response.data, function(index, spec) {
-                                $specSelect.append('<option value="' + spec.id + '">' + spec.name + '</option>');
-                            });
+        $.ajax({
+            url: '/get_specialization',
+            type: 'POST',
+            data: {
+                HUMAN_TYPE: humanTypeId,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                $specSelect.prop('disabled', true);
+                $specSelect.next('.spinner-border').remove();
+                $specSelect.parent().append('<span class="spinner-border spinner-border-sm align-middle ms-2"></span>');
+            },
+            success: function(response) {
+                $specSelect.prop('disabled', false);
+                $('.spinner-border').remove();
 
-                            $specSelect.trigger('change');
+                console.log('Specialization response:', response);
 
-                            // Auto-open the dropdown
-                            setTimeout(function() {
-                                try {
-                                    $specSelect.select2('open');
-                                } catch(e) {
-                                    console.log('Could not open select2:', e);
-                                }
-                            }, 200);
-                        } else {
-                            Swal.fire({
-                                text: "No specializations found for this role.",
-                                icon: "warning",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
-                                }
-                            });
-                            $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>').trigger('change');
+                if (response.status === 'success' && response.data && response.data.length > 0) {
+                    $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>');
+
+                    $.each(response.data, function(index, spec) {
+                        $specSelect.append('<option value="' + spec.id + '">' + spec.name + '</option>');
+                    });
+
+                    $specSelect.trigger('change');
+                } else {
+                    Swal.fire({
+                        text: "No specializations found for this role.",
+                        icon: "warning",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        $specSelect.prop('disabled', false);
-                        $('.spinner-border').remove();
-                        console.error('AJAX Error:', error, xhr);
+                    });
+                    $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>').trigger('change');
+                }
+            },
+            error: function(xhr, status, error) {
+                $specSelect.prop('disabled', false);
+                $('.spinner-border').remove();
+                console.error('AJAX Error:', error, xhr);
 
-                        Swal.fire({
-                            text: "Failed to load specializations. Please try again.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn btn-primary"
-                            }
-                        });
-                        $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>').trigger('change');
+                Swal.fire({
+                    text: "Failed to load specializations. Please try again.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn btn-primary"
                     }
                 });
-            } else {
                 $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>').trigger('change');
             }
         });
@@ -330,7 +319,6 @@ var KTApplyMission = function () {
                 });
 
                 filePreview.innerHTML = html;
-                console.log('Preview updated');
             }
 
             // Update actual file inputs
@@ -458,29 +446,49 @@ var KTApplyMission = function () {
 
                     if (xhr.responseJSON) {
                         if (xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
+                            errorMessage = '<h4 class="mb-4">' + xhr.responseJSON.message + '</h4>';
                         }
 
-                        // عرض أخطاء الـ validation
+                        // عرض أخطاء الـ validation بطريقة منظمة
                         if (xhr.responseJSON.errors) {
-                            let errorList = '<ul class="text-start">';
-                            $.each(xhr.responseJSON.errors, function(field, messages) {
-                                $.each(messages, function(index, message) {
-                                    errorList += '<li>' + message + '</li>';
-                                });
+                            let organizedErrors = xhr.responseJSON.errors;
+                            let errorSections = '';
+
+                            // عناوين الأقسام بالعربي
+                            const sectionTitles = {
+                                'basic_info': '📋 Basic Information',
+                                'qualifications': '🎓 Academic Qualifications',
+                                'experience': '💼 Professional Experience',
+                                'other': '📌 Other Fields'
+                            };
+
+                            // عرض الأخطاء حسب الأقسام
+                            $.each(organizedErrors, function(section, messages) {
+                                if (messages.length > 0) {
+                                    errorSections += '<div class="mb-4">';
+                                    errorSections += '<h5 class="text-dark fw-bold mb-2">' + (sectionTitles[section] || section) + '</h5>';
+                                    errorSections += '<ul class="text-start mb-0">';
+                                    $.each(messages, function(index, message) {
+                                        errorSections += '<li class="text-muted">' + message + '</li>';
+                                    });
+                                    errorSections += '</ul>';
+                                    errorSections += '</div>';
+                                }
                             });
-                            errorList += '</ul>';
-                            errorMessage = errorList;
+
+                            errorMessage += errorSections;
                         }
                     }
 
                     Swal.fire({
                         html: errorMessage,
                         icon: "error",
+                        width: '600px',
                         buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
+                        confirmButtonText: "Ok, I'll fix it!",
                         customClass: {
-                            confirmButton: "btn btn-primary"
+                            confirmButton: "btn btn-primary",
+                            popup: 'text-start'
                         }
                     });
                 }
@@ -509,7 +517,12 @@ var KTApplyMission = function () {
 
             // Initialize all components
             initializeSelect2();
-            handleHumanTypeChange();
+
+            // Auto-load specializations after Select2 is initialized
+            setTimeout(function() {
+                loadSpecializationsOnInit();
+            }, 300);
+
             initializeConditionalFields();
             initializeRepeater();
             initializeFileUpload();

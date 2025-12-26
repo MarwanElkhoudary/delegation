@@ -149,12 +149,12 @@
             <div class="mission-info-card">
                 <h2>{{ $mission->title ?? 'Mission Details' }}</h2>
 
-                <div class="row g-3">
+                <div class="row">
                     <div class="col-md-2">
                         <div class="mission-detail">
-                            <i class="ki-outline ki-information fs-2"></i>
+                            <i class="ki-outline ki-information"></i>
                             <div class="mission-detail-content">
-                                <div class="mission-detail-label">STATUS</div>
+                                <div class="mission-detail-label">Status</div>
                                 <div class="mission-detail-value">
                                     <span class="status-badge status-{{ $mission->duration_state == 1 ? 'active' : ($mission->duration_state == 0 ? 'pending' : 'completed') }}">
                                         {{ $mission->duration_state == 1 ? 'Active' : ($mission->duration_state == 0 ? 'Pending' : 'Completed') }}
@@ -166,9 +166,9 @@
 
                     <div class="col-md-2">
                         <div class="mission-detail">
-                            <i class="ki-outline ki-calendar fs-2"></i>
+                            <i class="ki-outline ki-calendar"></i>
                             <div class="mission-detail-content">
-                                <div class="mission-detail-label">START DATE</div>
+                                <div class="mission-detail-label">Start Date</div>
                                 <div class="mission-detail-value">{{ $mission->start_date ? date('d M Y', strtotime($mission->start_date)) : 'N/A' }}</div>
                             </div>
                         </div>
@@ -176,9 +176,9 @@
 
                     <div class="col-md-2">
                         <div class="mission-detail">
-                            <i class="ki-outline ki-calendar-tick fs-2"></i>
+                            <i class="ki-outline ki-calendar-tick"></i>
                             <div class="mission-detail-content">
-                                <div class="mission-detail-label">END DATE</div>
+                                <div class="mission-detail-label">End Date</div>
                                 <div class="mission-detail-value">{{ $mission->end_date ? date('d M Y', strtotime($mission->end_date)) : 'N/A' }}</div>
                             </div>
                         </div>
@@ -186,9 +186,9 @@
 
                     <div class="col-md-3">
                         <div class="mission-detail">
-                            <i class="ki-outline ki-user fs-2"></i>
+                            <i class="ki-outline ki-user"></i>
                             <div class="mission-detail-content">
-                                <div class="mission-detail-label">CONTACT NAME</div>
+                                <div class="mission-detail-label">Contact Name</div>
                                 <div class="mission-detail-value">{{ $mission->contact_name ?? 'N/A' }}</div>
                             </div>
                         </div>
@@ -196,9 +196,9 @@
 
                     <div class="col-md-3">
                         <div class="mission-detail">
-                            <i class="ki-outline ki-phone fs-2"></i>
+                            <i class="ki-outline ki-phone"></i>
                             <div class="mission-detail-content">
-                                <div class="mission-detail-label">CONTACT PHONE</div>
+                                <div class="mission-detail-label">Contact Phone</div>
                                 <div class="mission-detail-value">{{ $mission->contact_phone ?? 'N/A' }}</div>
                             </div>
                         </div>
@@ -228,19 +228,20 @@
                     <div class="row">
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Would you like to apply for this mission as</label>
-                            <select class="form-select form-select-solid" name="human_type" id="human_type" data-control="select2" data-placeholder="Select Your Role" disabled>
+                            <select class="form-select form-select-solid" name="human_type_display" id="human_type_display" data-control="select2" data-placeholder="Select Your Role" disabled>
+                                <option value="" disabled>Select Your Role</option>
                                 @foreach ($humanTypes as $type)
                                     <option value="{{ $type->id }}" {{ $application->human_type_id == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                                 @endforeach
                             </select>
-                            <!-- Hidden input to send the value since disabled fields don't submit -->
-                            <input type="hidden" name="human_type" value="{{ $application->human_type_id }}">
+                            <!-- Hidden input to ensure the value is submitted -->
+                            <input type="hidden" name="human_type" id="human_type" value="{{ $application->human_type_id }}"/>
                         </div>
 
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Select Your Specialization</label>
                             <select class="form-select form-select-solid" name="specialization" id="specialization" data-control="select2" data-placeholder="Select Your Specialization">
-                                <option value="{{ $application->specialization_id }}" selected>{{ $application->specialization->name ?? 'Select Your Specialization' }}</option>
+                                <option value="" disabled selected>Select Your Specialization</option>
                             </select>
                         </div>
                     </div>
@@ -296,7 +297,7 @@
                                     ];
                                 @endphp
                                 @foreach($countries as $country)
-                                    <option value="{{ $country }}">{{ $country }}</option>
+                                    <option value="{{ $country }}" {{ $application->nationality == $country ? 'selected' : '' }}>{{ $country }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -543,32 +544,39 @@
                 <div class="form-section">
                     <h3 class="form-section-title">Supporting Documents</h3>
 
-                    <!-- Display existing files -->
-                    @if($application->files && $application->files->count() > 0)
-                        <div class="mb-5">
-                            <label class="fs-6 fw-semibold mb-3">Current Files:</label>
-                            <div id="existing_files">
+                    <div class="mb-7">
+                        <label class="fs-6 fw-semibold mb-2">Upload Files (Maximum 10 files)</label>
+
+                        @if($application->files && $application->files->count() > 0)
+                            <div class="mb-5">
+                                <h6 class="mb-3">Existing Files:</h6>
                                 @foreach($application->files as $file)
-                                    <div class="d-flex align-items-center p-3 mb-2 border border-gray-300 rounded" id="existing_file_{{ $file->id }}">
-                                        <i class="ki-outline ki-file fs-2 text-primary me-3"></i>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold">{{ $file->file_name }}</div>
-                                            <small class="text-muted">{{ number_format($file->file_size / 1024, 2) }} KB</small>
+                                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ki-duotone ki-file fs-2 text-primary me-3">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            <div>
+                                                <div class="fw-bold">{{ $file->file_name }}</div>
+                                                <div class="text-muted fs-7">{{ number_format($file->file_size / 1024, 2) }} KB</div>
+                                            </div>
                                         </div>
-                                        <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank" class="btn btn-sm btn-light-primary me-2">
-                                            <i class="ki-outline ki-eye"></i> View
-                                        </a>
                                         <button type="button" class="btn btn-sm btn-light-danger" onclick="deleteFile({{ $file->id }})">
-                                            <i class="ki-outline ki-trash"></i> Delete
+                                            <i class="ki-duotone ki-trash fs-5">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                                <span class="path4"></span>
+                                                <span class="path5"></span>
+                                            </i>
+                                            Delete
                                         </button>
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-                    @endif
+                        @endif
 
-                    <div class="mb-7">
-                        <label class="fs-6 fw-semibold mb-2">Upload New Files (Maximum 10 files)</label>
                         <div class="file-upload-wrapper">
                             <!-- Hidden file input for actual upload -->
                             <input type="file" name="file_input_temp" id="file_input_temp" multiple class="d-none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"/>
@@ -617,17 +625,103 @@
 @section('js')
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/plugins/custom/formrepeater/formrepeater.bundle.js') }}"></script>
-
-    <script>
-        // Set flag to prevent apply-mission.js from resetting values
-        window.isEditMode = true;
-        window.applicationData = @json($application);
-    </script>
-
     <script src="{{ asset('assets/javascript/unauthorized/pages/apply-mission.js') }}"></script>
 
     <script>
-        // Delete file function
+        // Load specializations and set the selected value
+        $(document).ready(function() {
+            var selectedSpecialization = '{{ $application->specialization_id }}';
+            var humanTypeId = $('#human_type').val();
+
+            console.log('=== Edit Application Page Initialized ===');
+            console.log('Selected Specialization ID:', selectedSpecialization);
+            console.log('Human Type ID:', humanTypeId);
+
+            // Function to load specializations
+            function loadSpecializations() {
+                if (!humanTypeId) {
+                    console.error('No human_type_id found!');
+                    return;
+                }
+
+                console.log('Loading specializations for human_type:', humanTypeId);
+
+                $.ajax({
+                    url: '/get_specialization',
+                    type: 'POST',
+                    data: {
+                        HUMAN_TYPE: humanTypeId,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $('#specialization').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        console.log('Specializations response:', response);
+
+                        if (response.status === 'success' && response.data && response.data.length > 0) {
+                            var $specSelect = $('#specialization');
+                            $specSelect.empty();
+                            $specSelect.append('<option value="" disabled>Select Your Specialization</option>');
+
+                            $.each(response.data, function(index, spec) {
+                                var isSelected = spec.id == selectedSpecialization ? 'selected' : '';
+                                $specSelect.append('<option value="' + spec.id + '" ' + isSelected + '>' + spec.name + '</option>');
+                            });
+
+                            $specSelect.prop('disabled', false);
+
+                            // Set the value and trigger change
+                            if (selectedSpecialization) {
+                                $specSelect.val(selectedSpecialization).trigger('change');
+                                console.log('✓ Specialization set to:', selectedSpecialization);
+                            }
+
+                            console.log('✓ Loaded ' + response.data.length + ' specializations');
+                        } else {
+                            console.warn('No specializations found in response');
+                            $('#specialization').prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('✗ Failed to load specializations:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        $('#specialization').prop('disabled', false);
+
+                        Swal.fire({
+                            text: "Failed to load specializations. Please refresh the page.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Wait for Select2 to initialize, then load specializations
+            setTimeout(function() {
+                console.log('Initializing Select2 and loading specializations...');
+
+                // Initialize Select2 for specialization if not already initialized
+                if (!$('#specialization').hasClass('select2-hidden-accessible')) {
+                    $('#specialization').select2({
+                        placeholder: "Select Your Specialization",
+                        allowClear: true
+                    });
+                }
+
+                loadSpecializations();
+            }, 500);
+        });
+
+        // Delete existing file function
         function deleteFile(fileId) {
             Swal.fire({
                 text: "Are you sure you want to delete this file?",
@@ -638,9 +732,9 @@
                 cancelButtonText: "No, cancel",
                 customClass: {
                     confirmButton: "btn btn-danger",
-                    cancelButton: "btn btn-light"
+                    cancelButton: "btn btn-secondary"
                 }
-            }).then(function (result) {
+            }).then(function(result) {
                 if (result.isConfirmed) {
                     $.ajax({
                         url: '/application/file/' + fileId,
@@ -649,25 +743,26 @@
                             _token: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            $('#existing_file_' + fileId).fadeOut(300, function() {
-                                $(this).remove();
-                            });
-                            Swal.fire({
-                                text: "File deleted successfully!",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn btn-primary"
-                                }
-                            });
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    text: response.message,
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                }).then(function() {
+                                    location.reload();
+                                });
+                            }
                         },
-                        error: function() {
+                        error: function(xhr) {
                             Swal.fire({
-                                text: "Error deleting file. Please try again.",
+                                text: "Failed to delete file. Please try again.",
                                 icon: "error",
                                 buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
+                                confirmButtonText: "Ok",
                                 customClass: {
                                     confirmButton: "btn btn-primary"
                                 }
@@ -677,30 +772,5 @@
                 }
             });
         }
-
-        // Simplified: PHP already fills the values, we just need to preserve them
-        $(document).ready(function() {
-            console.log('Edit mode - values pre-filled from PHP');
-
-            // Auto-load specializations based on user's role
-            setTimeout(function() {
-                $('#human_type').val('{{ $application->human_type_id }}').trigger('change');
-                console.log('Auto-loaded specializations for role: {{ $application->human_type_id }}');
-            }, 500);
-
-            // Just update UI elements
-            setTimeout(function() {
-                // Update button text
-                $('#submit_btn .indicator-label').text('Update Application');
-
-                // Add edit notification
-                if($('.mission-info-card p.text-white').length === 0) {
-                    $('.mission-info-card h2').after('<p class="text-white mt-2"><i class="ki-outline ki-information fs-4"></i> You are editing your existing application</p>');
-                }
-
-                // Update back button
-                $('a[href="/calendar"]').attr('href', '{{ route("application.view", $application->id) }}').html('<i class="ki-duotone ki-arrow-left fs-3"><span class="path1"></span><span class="path2"></span></i> Back to Application');
-            }, 500);
-        });
     </script>
 @endsection

@@ -19,7 +19,7 @@
             <!--end::Progress-->
             <!--begin::Stats-->
 
-            @php
+            <?php
                 use App\Models\Task;
                 if (Auth::user()->role_id == 1){
                 $recently   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 1)->get();
@@ -45,7 +45,7 @@
                 $approved   = Task::where('status_id', 6)->get();
                 }
 
-            @endphp
+            ?>
 
 
             <div class="d-flex mb-8 mb-lg-10">
@@ -55,7 +55,7 @@
                     <span class="fs-6 text-gray-500 fw-bold">Recently</span>
                     <!--end::Date-->
                     <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-primary">{{count($recently)}}</div>
+                    <div class="fs-2 fw-bold text-primary"><?php echo e(count($recently)); ?></div>
                     <!--end::Label-->
                 </div>
                 <!--end::Stat-->
@@ -65,7 +65,7 @@
                     <span class="fs-6 text-gray-500 fw-bold">Approved</span>
                     <!--end::Date-->
                     <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-info">{{count($approved)}}</div>
+                    <div class="fs-2 fw-bold text-info"><?php echo e(count($approved)); ?></div>
                     <!--end::Label-->
                 </div>
                 <!--end::Stat-->
@@ -79,7 +79,7 @@
                     <span class="fs-6 text-gray-500 fw-bold">Ongoing</span>
                     <!--end::Date-->
                     <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-warning">{{count($ongoing)}}</div>
+                    <div class="fs-2 fw-bold text-warning"><?php echo e(count($ongoing)); ?></div>
                     <!--end::Label-->
                 </div>
                 <!--end::Stat-->
@@ -89,7 +89,7 @@
                     <span class="fs-6 text-gray-500 fw-bold">Suspended</span>
                     <!--end::Date-->
                     <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-dark">{{count($suspended)}}</div>
+                    <div class="fs-2 fw-bold text-dark"><?php echo e(count($suspended)); ?></div>
                     <!--end::Label-->
                 </div>
                 <!--end::Stat-->
@@ -102,7 +102,7 @@
                     <span class="fs-6 text-gray-500 fw-bold">Completed</span>
                     <!--end::Date-->
                     <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-success">{{count($completed)}}</div>
+                    <div class="fs-2 fw-bold text-success"><?php echo e(count($completed)); ?></div>
                     <!--end::Label-->
                 </div>
                 <!--end::Stat-->
@@ -112,7 +112,7 @@
                     <span class="fs-6 text-gray-500 fw-bold">Rejected</span>
                     <!--end::Date-->
                     <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-danger">{{count($rejected)}}</div>
+                    <div class="fs-2 fw-bold text-danger"><?php echo e(count($rejected)); ?></div>
                     <!--end::Label-->
                 </div>
                 <!--end::Stat-->
@@ -129,7 +129,7 @@
                     <!--begin::Col-->
                     <div class="col-6">
                         <!--begin::Link-->
-                        <a href="{{ url('/calendar') }}" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
+                        <a href="<?php echo e(url('/calendar')); ?>" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
                             <!--begin::Icon-->
                             <span class="mb-2">
                                             <i class="ki-outline ki-calendar fs-1"></i>
@@ -145,7 +145,7 @@
                     <!--begin::Col-->
                     <div class="col-6">
                         <!--begin::Link-->
-                        <a href="{{ url('/health_staff') }}" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
+                        <a href="<?php echo e(url('/health_staff')); ?>" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
                             <!--begin::Icon-->
                             <span class="mb-2">
                                             <i class="ki-outline ki-tablet-book fs-1"></i>
@@ -232,3 +232,4 @@
     <!--end::Sidebar nav-->
 </div>
 <!--end::Sidebar-->
+<?php /**PATH D:\work\laragon\www\delegation\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>

@@ -20,7 +20,7 @@ class HealthStaffRegistrationController extends Controller
     {
         $humanTypes = HumanType::all();
         $languages = Language::all();
-        
+
         return view('health-staff.register', compact('humanTypes', 'languages'));
     }
 
@@ -51,6 +51,7 @@ class HealthStaffRegistrationController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role_id' => 6, // Health Staff role
+                'human_type_id' => $request->human_type, // ✅ جديد
                 'hospital_id' => null,
             ]);
 
@@ -69,7 +70,7 @@ class HealthStaffRegistrationController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Health Staff Registration Error: ' . $e->getMessage());
-            
+
             return back()
                 ->withInput()
                 ->with('error', 'An error occurred during registration. Please try again.');
@@ -82,7 +83,7 @@ class HealthStaffRegistrationController extends Controller
     public function getSpecializations(Request $request)
     {
         $specializations = Specialization::where('human_type_id', $request->human_type_id)->get();
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $specializations

@@ -150,7 +150,7 @@
                 <h2>{{ $mission->title ?? 'Mission Details' }}</h2>
 
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="mission-detail">
                             <i class="ki-outline ki-information"></i>
                             <div class="mission-detail-content">
@@ -164,7 +164,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="mission-detail">
                             <i class="ki-outline ki-calendar"></i>
                             <div class="mission-detail-content">
@@ -174,7 +174,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="mission-detail">
                             <i class="ki-outline ki-calendar-tick"></i>
                             <div class="mission-detail-content">
@@ -186,10 +186,20 @@
 
                     <div class="col-md-3">
                         <div class="mission-detail">
-                            <i class="ki-outline ki-geolocation"></i>
+                            <i class="ki-outline ki-user"></i>
                             <div class="mission-detail-content">
-                                <div class="mission-detail-label">Contact</div>
+                                <div class="mission-detail-label">Contact Name</div>
                                 <div class="mission-detail-value">{{ $mission->contact_name ?? 'N/A' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="mission-detail">
+                            <i class="ki-outline ki-phone"></i>
+                            <div class="mission-detail-content">
+                                <div class="mission-detail-label">Contact Phone</div>
+                                <div class="mission-detail-value">{{ $mission->contact_phone ?? 'N/A' }}</div>
                             </div>
                         </div>
                     </div>
@@ -218,20 +228,14 @@
                     <div class="row">
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Would you like to apply for this mission as</label>
-                            <select class="form-select form-select-solid" name="human_type" id="human_type" data-control="select2" data-placeholder="Select Your Role" disabled>
-                                @php
-                                    // Get user's health staff type from their registration
-                                    $userHealthStaff = \App\Models\HealthStaff::where('user_id', Auth::id())->first();
-                                    $userHumanTypeId = $userHealthStaff ? $userHealthStaff->human_type_id : null;
-                                @endphp
+                            <select class="form-select form-select-solid" name="human_type_display" id="human_type_display" data-control="select2" data-placeholder="Select Your Role" disabled>
+                                <option value="" disabled>Select Your Role</option>
                                 @foreach ($humanTypes as $type)
-                                    <option value="{{ $type->id }}" {{ $userHumanTypeId == $type->id ? 'selected' : '' }}>
-                                        {{ $type->name }}
-                                    </option>
+                                    <option value="{{ $type->id }}" {{ Auth::user()->human_type_id == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                                 @endforeach
                             </select>
-                            <!-- Hidden input to send the value since disabled fields don't submit -->
-                            <input type="hidden" name="human_type" value="{{ $userHumanTypeId }}">
+                            <!-- Hidden input to ensure the value is submitted -->
+                            <input type="hidden" name="human_type" id="human_type" value="{{ Auth::user()->human_type_id }}"/>
                         </div>
 
                         <div class="col-md-6 mb-7">
@@ -357,19 +361,19 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-7">
-                            <label class="fs-6 fw-semibold required mb-2">Years of Clinical Experience</label>
+                            <label class="fs-6 fw-semibold  mb-2">Years of Clinical Experience</label>
                             <input type="number" class="form-control form-control-solid" id="clinical_experience_years" name="clinical_experience_years" placeholder="e.g., 5" min="0">
                         </div>
 
                         <div class="col-md-6 mb-7">
-                            <label class="fs-6 fw-semibold required mb-2">Countries Previously Served In</label>
+                            <label class="fs-6 fw-semibold  mb-2">Countries Previously Served In</label>
                             <input type="text" class="form-control form-control-solid" id="countries_previously_served" name="countries_previously_served" placeholder="e.g., USA, Canada, UK">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12 mb-7">
-                            <label class="fs-6 fw-semibold required mb-2">Previous Employers</label>
+                            <label class="fs-6 fw-semibold  mb-2">Previous Employers</label>
                             <input type="text" class="form-control form-control-solid" id="previous_employers" name="previous_employers" placeholder="e.g., ABC Hospital, XYZ Clinic">
                         </div>
                     </div>
@@ -380,7 +384,7 @@
                     <h3 class="form-section-title">Specialized Experience</h3>
 
                     <div class="mb-7">
-                        <label class="fs-6 fw-semibold required mb-2">Experience in Disaster/Emergency Settings</label>
+                        <label class="fs-6 fw-semibold  mb-2">Experience in Disaster/Emergency Settings</label>
                         <div class="d-flex gap-5">
                             <div class="form-check form-check-custom form-check-solid">
                                 <input class="form-check-input" type="radio" value="yes" id="disaster_experience_yes" name="disaster_experience"/>
@@ -399,7 +403,7 @@
                     </div>
 
                     <div class="mb-7">
-                        <label class="fs-6 fw-semibold required mb-2">Volunteer Work Experience</label>
+                        <label class="fs-6 fw-semibold  mb-2">Volunteer Work Experience</label>
                         <div class="d-flex gap-5">
                             <div class="form-check form-check-custom form-check-solid">
                                 <input class="form-check-input" type="radio" value="yes" id="volunteer_experience_yes" name="volunteer_experience"/>
@@ -413,7 +417,7 @@
                     </div>
 
                     <div class="mb-7" id="volunteer_experience_description_row" style="display: none;">
-                        <label class="fs-6 fw-semibold required mb-2">Please describe your volunteer experience</label>
+                        <label class="fs-6 fw-semibold  mb-2">Please describe your volunteer experience</label>
                         <textarea class="form-control form-control-solid" rows="4" id="volunteer_experience_description" name="volunteer_experience_description" placeholder="Describe your experience..."></textarea>
                     </div>
                 </div>
@@ -449,17 +453,17 @@
                     <h3 class="form-section-title">Additional Information</h3>
 
                     <div class="mb-7">
-                        <label class="fs-6 fw-semibold required mb-2">Educational or Training Contributions</label>
+                        <label class="fs-6 fw-semibold  mb-2">Educational or Training Contributions</label>
                         <textarea class="form-control form-control-solid" rows="3" id="educational_contributions" name="educational_contributions" placeholder="e.g., Conducted surgical training workshops..."></textarea>
                     </div>
 
                     <div class="mb-7">
-                        <label class="fs-6 fw-semibold required mb-2">Published Scientific Papers</label>
+                        <label class="fs-6 fw-semibold  mb-2">Published Scientific Papers</label>
                         <textarea class="form-control form-control-solid" rows="3" id="published_scientific_papers" name="published_scientific_papers" placeholder="e.g., Published 'AI-Driven Diagnostic Models'..."></textarea>
                     </div>
 
                     <div class="mb-7">
-                        <label class="fs-6 fw-semibold required mb-2">Participation in Conferences or Workshops</label>
+                        <label class="fs-6 fw-semibold  mb-2">Participation in Conferences or Workshops</label>
                         <textarea class="form-control form-control-solid" rows="3" id="conference_participation" name="conference_participation" placeholder="e.g., Presented a research paper at..."></textarea>
                     </div>
                 </div>
@@ -564,20 +568,14 @@
     <script src="{{ asset('assets/javascript/unauthorized/pages/apply-mission.js') }}"></script>
 
     <script>
-        // Auto-load specializations based on user's role
+        // Debug: Check user data
         $(document).ready(function() {
-            @php
-                $userHealthStaff = \App\Models\HealthStaff::where('user_id', Auth::id())->first();
-                $userHumanTypeId = $userHealthStaff ? $userHealthStaff->human_type_id : null;
-            @endphp
-
-            @if($userHumanTypeId)
-            // Trigger specialization loading immediately
-            setTimeout(function() {
-                $('#human_type').val('{{ $userHumanTypeId }}').trigger('change');
-                console.log('Auto-loaded specializations for role: {{ $userHumanTypeId }}');
-            }, 500);
-            @endif
+            console.log('=== Apply Mission Page Debug ===');
+            console.log('User Role ID:', '{{ Auth::user()->role_id }}');
+            console.log('User Human Type ID:', '{{ Auth::user()->human_type_id ?? "NULL" }}');
+            console.log('Selected Human Type:', $('#human_type').val());
+            console.log('User Email:', '{{ Auth::user()->email }}');
+            console.log('User Name:', '{{ Auth::user()->name }}');
         });
     </script>
 @endsection

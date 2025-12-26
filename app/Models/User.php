@@ -18,7 +18,8 @@ class User extends Authenticatable implements AuthenticatableContract{
         'email',
         'password',
         'role_id',
-        'hospital_id'
+        'hospital_id',
+        'human_type_id'
     ];
 
 
@@ -30,5 +31,8 @@ class User extends Authenticatable implements AuthenticatableContract{
     public function hospital(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Hospital::class);
+    }
+    public function humanType() {
+        return $this->belongsTo(HumanType::class, 'human_type_id');
     }
 }
