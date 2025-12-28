@@ -23,24 +23,26 @@ Route::post('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/', [TaskController::class, 'index'])->middleware(['auth', 'verified']); // for task listing
-Route::get('/home', function() { return redirect('/calendar'); }); // redirect to calendar
-Route::get('/calendar', [MainController::class, 'index'])->name('calendar'); // calendar page
-Route::get('/apply-mission/{id}',  [MainController::class, 'showApplyPage'])->name('apply.mission.show');
-Route::get('/publish_tasks', [MainController::class, 'getPublishTasks'])->name('home.publish_tasks');
-Route::get('/application/success/{id}', [MainController::class, 'applicationSuccess'])
-    ->name('application.success');
-Route::get('/application/view/{id}', [MainController::class, 'viewApplication'])
-    ->name('application.view');
-Route::get('/application/edit/{id}', [MainController::class, 'editApplication'])
-    ->name('application.edit');
-Route::post('/application/update/{id}', [MainController::class, 'updateApplication'])
-    ->name('application.update');
-Route::delete('/application/file/{fileId}', [MainController::class, 'deleteApplicationFile'])
-    ->name('application.file.delete');
-//Route::post('/apply_to_mission', [MainController::class, 'applyToMission'])->name('apply_to_mission');
-Route::post('/get_specialization', [MainController::class, 'get_specialization']);
 
-Route::post('/apply_to_mission', [MainController::class, 'applyToMission'])->name('apply.mission');
+// ========== Protected Routes (Require Authentication) ==========
+Route::middleware(['auth'])->group(function () {
+    Route::get('/home', function() { return redirect('/calendar'); }); // redirect to calendar
+    Route::get('/calendar', [MainController::class, 'index'])->name('calendar'); // calendar page
+    Route::get('/apply-mission/{id}',  [MainController::class, 'showApplyPage'])->name('apply.mission.show');
+    Route::get('/publish_tasks', [MainController::class, 'getPublishTasks'])->name('home.publish_tasks');
+    Route::get('/application/success/{id}', [MainController::class, 'applicationSuccess'])
+        ->name('application.success');
+    Route::get('/application/view/{id}', [MainController::class, 'viewApplication'])
+        ->name('application.view');
+    Route::get('/application/edit/{id}', [MainController::class, 'editApplication'])
+        ->name('application.edit');
+    Route::post('/application/update/{id}', [MainController::class, 'updateApplication'])
+        ->name('application.update');
+    Route::delete('/application/file/{fileId}', [MainController::class, 'deleteApplicationFile'])
+        ->name('application.file.delete');
+    Route::post('/get_specialization', [MainController::class, 'get_specialization']);
+    Route::post('/apply_to_mission', [MainController::class, 'applyToMission'])->name('apply.mission');
+});
 
 
 Route::middleware('auth')->group(function () {

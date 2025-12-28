@@ -169,6 +169,22 @@ class MainController extends Controller
             $request->merge(['human_type' => $healthStaffData['human_type_id']]);
         }
 
+        // ✅ Check for duplicate application (only for new applications, not updates)
+        if ($user && $request->mission_id) {
+            $existingApplication = HealthStaff::where('task_id', $request->mission_id)
+                ->where('email', $user->email)
+                ->first();
+
+            if ($existingApplication) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You have already submitted an application for this mission',
+                    'duplicate' => true,
+                    'application_id' => $existingApplication->id
+                ], 422);
+            }
+        }
+
         // ✅ Validation - Only Basic Information Required
         $validator = Validator::make($request->all(), [
             // Required - Basic Information
@@ -228,19 +244,6 @@ class MainController extends Controller
                 'message' => 'Please check the required fields',
                 'errors' => $validator->errors()
             ], 422);
-        }
-
-        // Check for duplicate application
-        $existingApplication = HealthStaff::where('task_id', $request->mission_id)
-            ->where('email', $request->email ?? ($user ? $user->email : null))
-            ->first();
-
-        if ($existingApplication) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have already submitted an application for this mission',
-                'duplicate' => true
-            ], 409);
         }
 
         DB::beginTransaction();

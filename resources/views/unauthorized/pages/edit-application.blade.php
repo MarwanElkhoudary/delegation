@@ -502,7 +502,10 @@
                                             </div>
                                         </div>
                                     @endforeach
-                                @else
+                                @endif
+
+                                <!-- CRITICAL: Must have at least ONE repeater-item for template -->
+                                @if(!$application->workedWithDoctors || $application->workedWithDoctors->count() == 0)
                                     <div data-repeater-item>
                                         <div class="row mb-5">
                                             <div class="col-md-5">

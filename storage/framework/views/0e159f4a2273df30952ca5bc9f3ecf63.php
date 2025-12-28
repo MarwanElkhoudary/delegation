@@ -501,7 +501,10 @@
                                             </div>
                                         </div>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                <?php else: ?>
+                                <?php endif; ?>
+
+                                <!-- CRITICAL: Must have at least ONE repeater-item for template -->
+                                <?php if(!$application->workedWithDoctors || $application->workedWithDoctors->count() == 0): ?>
                                     <div data-repeater-item>
                                         <div class="row mb-5">
                                             <div class="col-md-5">

@@ -256,21 +256,50 @@ var KTApplyMission = function () {
 
     // Initialize form repeater for doctors
     const initializeRepeater = () => {
-        if (typeof $.fn.repeater === 'function') {
-            $('#doctors_repeater').repeater({
-                initEmpty: false,
-                defaultValues: {
-                    'doctor_name': '',
-                    'visited_date': ''
-                },
+        console.log('=== Repeater Initialization Debug ===');
+
+        // Check if jQuery is loaded
+        if (typeof $ === 'undefined') {
+            console.error('❌ jQuery is not loaded!');
+            return;
+        }
+        console.log('✓ jQuery loaded:', $.fn.jquery);
+
+        // Check if repeater library is loaded
+        if (typeof $.fn.repeater !== 'function') {
+            console.error('❌ jQuery Repeater plugin not loaded!');
+            return;
+        }
+        console.log('✓ Repeater plugin loaded');
+
+        // Check if element exists
+        const $repeater = $('#kt_docs_repeater_basic_doctors');
+        if ($repeater.length === 0) {
+            console.error('❌ Repeater element not found!');
+            return;
+        }
+        console.log('✓ Repeater element found');
+
+        try {
+            // Initialize the repeater - use repeaterVal() instead of complex config
+            $repeater.repeater({
                 show: function () {
+                    console.log('✓ Adding new row');
                     $(this).slideDown();
                 },
                 hide: function (deleteElement) {
-                    $(this).slideUp(deleteElement);
-                }
+                    console.log('✓ Deleting row');
+                    if(confirm('Are you sure you want to delete this row?')) {
+                        $(this).slideUp(deleteElement);
+                    }
+                },
+                isFirstItemUndeletable: false
             });
-            console.log('Form repeater initialized');
+
+            console.log('✓✓✓ Form repeater initialized! ✓✓✓');
+
+        } catch (error) {
+            console.error('❌ Error initializing repeater:', error);
         }
     };
 
@@ -378,10 +407,13 @@ var KTApplyMission = function () {
 
             const formData = new FormData(form);
 
-            console.log('Submitting application...');
+            // ✅ Get URL from form action attribute (works for both apply and edit)
+            const submitUrl = form.getAttribute('action') || '/apply_to_mission';
+
+            console.log('Submitting application to:', submitUrl);
 
             $.ajax({
-                url: '/apply_to_mission',
+                url: submitUrl,
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -492,7 +524,12 @@ var KTApplyMission = function () {
             }, 300);
 
             initializeConditionalFields();
-            initializeRepeater();
+
+            // Initialize repeater with delay to ensure DOM is ready
+            setTimeout(function() {
+                initializeRepeater();
+            }, 500);
+
             initializeFileUpload();
             handleFormSubmit();
 
