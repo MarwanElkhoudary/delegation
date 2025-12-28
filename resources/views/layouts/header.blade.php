@@ -27,7 +27,7 @@
                 <div class="app-navbar-item ms-3 ms-lg-5" id="kt_header_user_menu_toggle">
                     <!--begin::Menu wrapper-->
                     <div class="cursor-pointer symbol symbol-35px symbol-md-40px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-{{--                        <img class="symbol symbol-circle symbol-35px symbol-md-40px" src="{{ asset('assets')}}/media/avatars/300-13.jpg" alt="user" />--}}
+                        {{--                        <img class="symbol symbol-circle symbol-35px symbol-md-40px" src="{{ asset('assets')}}/media/avatars/300-13.jpg" alt="user" />--}}
                         <h6 class="page-heading d-flex flex-column justify-content-center text-gray-9500 fw-bold fs-md-1x gap-2">
                             <span>
                                 <span class="fw-light">Welcome </span>
@@ -67,9 +67,9 @@
 
                         <!--begin::Menu item-->
                         <div class="menu-item px-5">
-                            <form id="logout-form"  method="GET" action="{{route('logout')}}" >
+                            <form id="logout-form"  method="POST" action="{{route('logout')}}" >
                                 @csrf
-                                <a href="#" onclick="document.getElementById('logout-form').submit();" class="menu-link px-5">Sign Out</a>
+                                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="menu-link px-5">Sign Out</a>
                             </form>                        </div>
                         <!--end::Menu item-->
                     </div>

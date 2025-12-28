@@ -1,9 +1,7 @@
-@extends('unauthorized.index')
-
-@section('css')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="{{ asset('assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('assets/plugins/custom/formrepeater/formrepeater.bundle.css') }}" rel="stylesheet" type="text/css"/>
+<?php $__env->startSection('css'); ?>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <link href="<?php echo e(asset('assets/plugins/global/plugins.bundle.css')); ?>" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets/plugins/custom/formrepeater/formrepeater.bundle.css')); ?>" rel="stylesheet" type="text/css"/>
 
     <style>
         .mission-info-card {
@@ -140,14 +138,14 @@
             font-size: 18px;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div id="kt_app_content" class="app-content flex-column-fluid">
         <div class="container-xxl">
             <!-- Mission Info Card -->
             <div class="mission-info-card">
-                <h2>{{ $mission->title ?? 'Mission Details' }}</h2>
+                <h2><?php echo e($mission->title ?? 'Mission Details'); ?></h2>
 
                 <div class="row">
                     <div class="col-md-2">
@@ -156,8 +154,9 @@
                             <div class="mission-detail-content">
                                 <div class="mission-detail-label">Status</div>
                                 <div class="mission-detail-value">
-                                    <span class="status-badge status-{{ $mission->duration_state == 1 ? 'active' : ($mission->duration_state == 0 ? 'pending' : 'completed') }}">
-                                        {{ $mission->duration_state == 1 ? 'Active' : ($mission->duration_state == 0 ? 'Pending' : 'Completed') }}
+                                    <span class="status-badge status-<?php echo e($mission->duration_state == 1 ? 'active' : ($mission->duration_state == 0 ? 'pending' : 'completed')); ?>">
+                                        <?php echo e($mission->duration_state == 1 ? 'Active' : ($mission->duration_state == 0 ? 'Pending' : 'Completed')); ?>
+
                                     </span>
                                 </div>
                             </div>
@@ -169,7 +168,7 @@
                             <i class="ki-outline ki-calendar"></i>
                             <div class="mission-detail-content">
                                 <div class="mission-detail-label">Start Date</div>
-                                <div class="mission-detail-value">{{ $mission->start_date ? date('d M Y', strtotime($mission->start_date)) : 'N/A' }}</div>
+                                <div class="mission-detail-value"><?php echo e($mission->start_date ? date('d M Y', strtotime($mission->start_date)) : 'N/A'); ?></div>
                             </div>
                         </div>
                     </div>
@@ -179,7 +178,7 @@
                             <i class="ki-outline ki-calendar-tick"></i>
                             <div class="mission-detail-content">
                                 <div class="mission-detail-label">End Date</div>
-                                <div class="mission-detail-value">{{ $mission->end_date ? date('d M Y', strtotime($mission->end_date)) : 'N/A' }}</div>
+                                <div class="mission-detail-value"><?php echo e($mission->end_date ? date('d M Y', strtotime($mission->end_date)) : 'N/A'); ?></div>
                             </div>
                         </div>
                     </div>
@@ -189,7 +188,7 @@
                             <i class="ki-outline ki-user"></i>
                             <div class="mission-detail-content">
                                 <div class="mission-detail-label">Contact Name</div>
-                                <div class="mission-detail-value">{{ $mission->contact_name ?? 'N/A' }}</div>
+                                <div class="mission-detail-value"><?php echo e($mission->contact_name ?? 'N/A'); ?></div>
                             </div>
                         </div>
                     </div>
@@ -199,27 +198,27 @@
                             <i class="ki-outline ki-phone"></i>
                             <div class="mission-detail-content">
                                 <div class="mission-detail-label">Contact Phone</div>
-                                <div class="mission-detail-value">{{ $mission->contact_phone ?? 'N/A' }}</div>
+                                <div class="mission-detail-value"><?php echo e($mission->contact_phone ?? 'N/A'); ?></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                @if($mission->description)
+                <?php if($mission->description): ?>
                     <div class="mission-detail" style="margin-top: 15px;">
                         <i class="ki-outline ki-abstract-26"></i>
                         <div class="mission-detail-content">
                             <div class="mission-detail-label">Description</div>
-                            <div class="mission-detail-value">{{ $mission->description }}</div>
+                            <div class="mission-detail-value"><?php echo e($mission->description); ?></div>
                         </div>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
 
             <!-- Application Form -->
             <form class="form" action="/apply_to_mission" method="POST" id="apply_mission_form" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="mission_id" value="{{ $mission->id }}"/>
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="mission_id" value="<?php echo e($mission->id); ?>"/>
 
                 <!-- Basic Information Section -->
                 <div class="form-section">
@@ -229,15 +228,15 @@
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold  mb-2">Would you like to apply for this mission as</label>
 
-                            @if(Auth::user()->human_type_id)
+                            <?php if(Auth::user()->human_type_id): ?>
                                 <select class="form-select form-select-solid" name="human_type_display" id="human_type_display" data-control="select2" data-placeholder="Select Your Role" disabled>
                                     <option value="" disabled>Select Your Role</option>
-                                    @foreach ($humanTypes as $type)
-                                        <option value="{{ $type->id }}" {{ Auth::user()->human_type_id == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = $humanTypes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($type->id); ?>" <?php echo e(Auth::user()->human_type_id == $type->id ? 'selected' : ''); ?>><?php echo e($type->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
-                                <input type="hidden" name="human_type" id="human_type" value="{{ Auth::user()->human_type_id }}"/>
-                            @else
+                                <input type="hidden" name="human_type" id="human_type" value="<?php echo e(Auth::user()->human_type_id); ?>"/>
+                            <?php else: ?>
                                 <div class="alert alert-danger d-flex align-items-center p-5">
                                     <i class="ki-duotone ki-information fs-2hx text-danger me-4">
                                         <span class="path1"></span>
@@ -250,12 +249,12 @@
                                     </div>
                                 </div>
                                 <input type="hidden" name="human_type" id="human_type" value=""/>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
                         <div class="col-md-6 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Select Your Specialization</label>
-                            <select class="form-select form-select-solid" name="specialization" id="specialization" data-control="select2" data-placeholder="Select Your Specialization" {{ !Auth::user()->human_type_id ? 'disabled' : '' }}>
+                            <select class="form-select form-select-solid" name="specialization" id="specialization" data-control="select2" data-placeholder="Select Your Specialization" <?php echo e(!Auth::user()->human_type_id ? 'disabled' : ''); ?>>
                                 <option value="" disabled selected>Select Your Specialization</option>
                             </select>
                         </div>
@@ -280,14 +279,14 @@
 
                         <div class="col-md-4 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Birth of Date</label>
-                            <input type="date" class="form-control form-control-solid" name="birth_date" id="birth_date" max="{{ date('Y-m-d') }}" min="1920-01-01">
+                            <input type="date" class="form-control form-control-solid" name="birth_date" id="birth_date" max="<?php echo e(date('Y-m-d')); ?>" min="1920-01-01">
                         </div>
 
                         <div class="col-md-4 mb-7">
                             <label class="fs-6 fw-semibold required mb-2">Nationality</label>
                             <select class="form-select form-select-solid" name="nationality" id="nationality" data-control="select2" data-placeholder="Select Nationality">
                                 <option value="" disabled selected>Select Nationality</option>
-                                @php
+                                <?php
                                     $countries = [
                                         'Afghan', 'Albanian', 'Algerian', 'American', 'Andorran', 'Angolan', 'Antiguans', 'Argentinean', 'Armenian', 'Australian',
                                         'Austrian', 'Azerbaijani', 'Bahamian', 'Bahraini', 'Bangladeshi', 'Barbadian', 'Barbudans', 'Batswana', 'Belarusian', 'Belgian',
@@ -310,10 +309,10 @@
                                         'Tongan', 'Trinidadian or Tobagonian', 'Tunisian', 'Turkish', 'Tuvaluan', 'Ugandan', 'Ukrainian', 'Uruguayan', 'Uzbekistani', 'Venezuelan',
                                         'Vietnamese', 'Welsh', 'Yemenite', 'Zambian', 'Zimbabwean'
                                     ];
-                                @endphp
-                                @foreach($countries as $country)
-                                    <option value="{{ $country }}">{{ $country }}</option>
-                                @endforeach
+                                ?>
+                                <?php $__currentLoopData = $countries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $country): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($country); ?>"><?php echo e($country); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
                     </div>
@@ -333,9 +332,9 @@
                             <label class="fs-6 fw-semibold required mb-2">Languages Spoken</label>
                             <select class="form-select form-select-solid" name="languages_spoken[]" id="languages_spoken" data-control="select2" data-close-on-select="false" data-placeholder="Select languages" data-allow-clear="true" multiple="multiple">
                                 <option></option>
-                                @foreach ($languages as $language)
-                                    <option value="{{ $language->id }}">{{ $language->name }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = $languages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $language): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($language->id); ?>"><?php echo e($language->name); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
                     </div>
@@ -575,22 +574,24 @@
             </form>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('js')
-    <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
-    <script src="{{ asset('assets/plugins/custom/formrepeater/formrepeater.bundle.js') }}"></script>
-    <script src="{{ asset('assets/javascript/unauthorized/pages/apply-mission.js') }}"></script>
+<?php $__env->startSection('js'); ?>
+    <script src="<?php echo e(asset('assets/plugins/global/plugins.bundle.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/plugins/custom/formrepeater/formrepeater.bundle.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/javascript/unauthorized/pages/apply-mission.js')); ?>"></script>
 
     <script>
         // Debug: Check user data
         $(document).ready(function() {
             console.log('=== Apply Mission Page Debug ===');
-            console.log('User Role ID:', '{{ Auth::user()->role_id }}');
-            console.log('User Human Type ID:', '{{ Auth::user()->human_type_id ?? "NULL" }}');
+            console.log('User Role ID:', '<?php echo e(Auth::user()->role_id); ?>');
+            console.log('User Human Type ID:', '<?php echo e(Auth::user()->human_type_id ?? "NULL"); ?>');
             console.log('Selected Human Type:', $('#human_type').val());
-            console.log('User Email:', '{{ Auth::user()->email }}');
-            console.log('User Name:', '{{ Auth::user()->name }}');
+            console.log('User Email:', '<?php echo e(Auth::user()->email); ?>');
+            console.log('User Name:', '<?php echo e(Auth::user()->name); ?>');
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('unauthorized.index', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/unauthorized/pages/apply-mission.blade.php ENDPATH**/ ?>

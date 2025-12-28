@@ -13,6 +13,7 @@ class HealthStaff extends Authenticatable
     protected $table = 'health_staff';
 
     protected $fillable = [
+        'user_id',
         'email',
         'username',
         'password',
@@ -60,6 +61,11 @@ class HealthStaff extends Authenticatable
     ];
 
     // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function task()
     {
         return $this->belongsTo(Task::class, 'task_id');

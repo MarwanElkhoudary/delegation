@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!--
 Author: Keenthemes
@@ -55,7 +54,13 @@ License: For each use you must have a valid license purchased only from above li
 </head>
 <!--end::Head-->
 <!--begin::Body-->
-<body  id="kt_app_body" data-kt-app-sidebar-enabled="false" data-kt-app-sidebar-fixed="false" data-kt-app-sidebar-push-toolbar="false" data-kt-app-sidebar-push-footer="false" data-kt-app-toolbar-enabled="true"  class="app-default" >
+<body  id="kt_app_body"
+       data-kt-app-sidebar-enabled="<?php echo e((Auth::check() && Auth::user()->role_id != 6) ? 'true' : 'false'); ?>"
+       data-kt-app-sidebar-fixed="true"
+       data-kt-app-sidebar-push-toolbar="true"
+       data-kt-app-sidebar-push-footer="true"
+       data-kt-app-toolbar-enabled="true"
+       class="app-default" >
 <!--layout-partial:partials/theme-mode/_init.html-->
 <?php echo $__env->make('unauthorized.partials.theme-mode._init', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <!-- Include Default Layout -->
@@ -82,7 +87,7 @@ License: For each use you must have a valid license purchased only from above li
 <script src="<?php echo e(asset('assets/js/scripts.bundle.js')); ?>"></script>
 <!--end::Global Javascript Bundle-->
 <!--begin::Vendors Javascript(used for this page only)-->
-<script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
+<script src="<?php echo e(asset('assets/plugins/custom/fullcalendar/fullcalendar.bundle.js')); ?>"></script>
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>

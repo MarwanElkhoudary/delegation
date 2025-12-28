@@ -22,23 +22,20 @@ class MainController extends Controller
     //
     public function index()
     {
-        // Ensure user is authenticated
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
+//        $languages = Language::all();
+//        $humanTypes = HumanType::all();
         return view('unauthorized.pages.home');
     }
 
     public function showApplyPage($id)
     {
-        // Ensure user is authenticated
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
         // Get mission details
-        $mission = Task::findOrFail($id);
+        $mission = Task::with([
+            'medicalNeeds.specialization.humanType',
+            'requirementNeeds',
+            'target',
+            'hospital'
+        ])->findOrFail($id);
 
         // Check if user is logged in
         $user = Auth::user();
@@ -46,8 +43,29 @@ class MainController extends Controller
         \Log::info('ShowApplyPage called', [
             'mission_id' => $id,
             'user_id' => $user ? $user->id : 'not logged in',
-            'user_email' => $user ? $user->email : 'N/A'
+            'user_email' => $user ? $user->email : 'N/A',
+            'user_role_id' => $user ? $user->role_id : 'N/A',
+            'user_human_type_id' => $user ? $user->human_type_id : 'N/A'
         ]);
+
+        // Check user role - if NOT health staff (role_id != 6), show mission details only
+        if ($user && $user->role_id != 6) {
+            \Log::info('User is not health staff, showing mission details only', [
+                'role_id' => $user->role_id
+            ]);
+            return view('unauthorized.pages.mission-details', compact('mission'));
+        }
+
+        // ✅ NEW: Check if health staff has human_type_id set
+        if ($user && $user->role_id == 6 && !$user->human_type_id) {
+            \Log::warning('User trying to apply without human_type_id', [
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+
+            return redirect()->back()->with('error',
+                'Please complete your registration first. Your staff type is missing. Contact the administrator.');
+        }
 
         // Check if user already applied to this mission
         $existingApplication = null;
@@ -70,13 +88,7 @@ class MainController extends Controller
             return redirect()->route('application.view', ['id' => $existingApplication->id]);
         }
 
-        // Check if mission is active
-//        if ($mission->duration_state !== 1) {
-//            return redirect()->route('calendar')
-//                ->with('error', 'This mission is not currently accepting applications.');
-//        }
-
-        // Get form data
+        // Get form data for health staff only (role_id = 6)
         $humanTypes = HumanType::all();
         $languages = Language::all();
 
@@ -142,7 +154,6 @@ class MainController extends Controller
 
     public function applyToMission(Request $request)
     {
-        // جلب بيانات المستخدم المسجل
         $user = Auth::user();
         $healthStaffData = Session::get('health_staff_data', []);
 
@@ -150,7 +161,6 @@ class MainController extends Controller
             $request->merge(['languages_spoken' => [$request->languages_spoken]]);
         }
 
-        // Pre-fill email and human_type from registration if available
         if ($user && !$request->has('email')) {
             $request->merge(['email' => $user->email]);
         }
@@ -159,9 +169,9 @@ class MainController extends Controller
             $request->merge(['human_type' => $healthStaffData['human_type_id']]);
         }
 
-        // 1. التحقق من البيانات (Validation)
+        // ✅ Validation - Only Basic Information Required
         $validator = Validator::make($request->all(), [
-            // Required: Mission & Basic Info
+            // Required - Basic Information
             'mission_id' => 'required|exists:tasks,id',
             'human_type' => 'required|exists:human_types,id',
             'specialization' => 'required|exists:specializations,id',
@@ -170,85 +180,57 @@ class MainController extends Controller
             'birth_date' => 'required|date|before:today',
             'nationality' => 'required|string|max:100',
             'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
             'languages_spoken' => 'required|array|min:1',
             'languages_spoken.*' => 'integer|exists:languages,id',
 
-            // Required: Academic Qualifications
-            'highest_qualification' => 'required|string|max:255',
-            'granting_university' => 'required|string|max:255',
-            'degree_granting_country' => 'required|string|max:100',
-            'date_of_graduation' => 'required|date',
-
-            // Optional: Professional Experience (nullable)
+            // Optional - Everything Else
+            'email' => 'nullable|email|max:255',
+            'highest_qualification' => 'nullable|string|max:255',
+            'granting_university' => 'nullable|string|max:255',
+            'degree_granting_country' => 'nullable|string|max:100',
+            'date_of_graduation' => 'nullable|date',
             'clinical_experience_years' => 'nullable|integer|min:0',
             'countries_previously_served' => 'nullable|string',
             'previous_employers' => 'nullable|string',
-
-            // Optional: Additional Experience (nullable)
             'disaster_experience' => 'nullable|in:yes,no',
-            'disaster_experience_description' => 'required_if:disaster_experience,yes|nullable|string',
+            'disaster_experience_description' => 'nullable|string',
             'volunteer_experience' => 'nullable|in:yes,no',
-            'volunteer_experience_description' => 'required_if:volunteer_experience,yes|nullable|string',
+            'volunteer_experience_description' => 'nullable|string',
             'visited_gaza' => 'nullable|in:yes,no',
             'place_of_work_previous_visit' => 'nullable|string|max:255',
-
-            // Optional: Academic Contributions (nullable)
             'educational_contributions' => 'nullable|string',
             'published_scientific_papers' => 'nullable|string',
             'conference_participation' => 'nullable|string',
-
-            // Optional: Files
             'files.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
             'doctors.*.doctor_name' => 'nullable|string|max:255',
             'doctors.*.visited_date' => 'nullable|date',
         ]);
 
-        // 2. إذا في أخطاء validation، ارجع response مع الأخطاء بطريقة منظمة
+        // Custom error messages
+        $validator->setCustomMessages([
+            'mission_id.required' => 'Please select a mission',
+            'human_type.required' => 'Staff type is required',
+            'specialization.required' => 'Specialization is required',
+            'full_name.required' => 'Full name is required',
+            'gender.required' => 'Gender is required',
+            'birth_date.required' => 'Date of birth is required',
+            'birth_date.before' => 'Date of birth must be in the past',
+            'nationality.required' => 'Nationality is required',
+            'phone.required' => 'Phone number is required',
+            'languages_spoken.required' => 'At least one language is required',
+            'languages_spoken.min' => 'At least one language must be selected',
+            'email.email' => 'Email address is invalid',
+        ]);
+
         if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            // تنظيم الأخطاء حسب الأقسام
-            $organizedErrors = [
-                'basic_info' => [],
-                'qualifications' => [],
-                'experience' => [],
-                'other' => []
-            ];
-
-            // حقول المعلومات الأساسية
-            $basicFields = ['human_type', 'specialization', 'full_name', 'gender', 'birth_date', 'nationality', 'phone', 'email', 'languages_spoken'];
-            // حقول المؤهلات
-            $qualificationFields = ['highest_qualification', 'granting_university', 'degree_granting_country', 'date_of_graduation'];
-            // حقول الخبرة
-            $experienceFields = ['clinical_experience_years', 'countries_previously_served', 'previous_employers', 'disaster_experience', 'volunteer_experience', 'visited_gaza', 'educational_contributions', 'published_scientific_papers', 'conference_participation'];
-
-            foreach ($errors->messages() as $field => $messages) {
-                if (in_array($field, $basicFields) || strpos($field, 'languages_spoken') !== false) {
-                    $organizedErrors['basic_info'] = array_merge($organizedErrors['basic_info'], $messages);
-                } elseif (in_array($field, $qualificationFields)) {
-                    $organizedErrors['qualifications'] = array_merge($organizedErrors['qualifications'], $messages);
-                } elseif (in_array($field, $experienceFields) || strpos($field, 'disaster') !== false || strpos($field, 'volunteer') !== false) {
-                    $organizedErrors['experience'] = array_merge($organizedErrors['experience'], $messages);
-                } else {
-                    $organizedErrors['other'] = array_merge($organizedErrors['other'], $messages);
-                }
-            }
-
-            // إزالة الأقسام الفاضية
-            $organizedErrors = array_filter($organizedErrors, function($section) {
-                return !empty($section);
-            });
-
             return response()->json([
                 'status' => 'error',
-                'message' => 'Please complete all required fields',
-                'errors' => $organizedErrors,
-                'all_errors' => $errors->all() // للاستخدام في حالة العرض البسيط
+                'message' => 'Please check the required fields',
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        // 2.5. فحص إذا المستخدم قدّم على نفس الـ mission قبل كده
+        // Check for duplicate application
         $existingApplication = HealthStaff::where('task_id', $request->mission_id)
             ->where('email', $request->email ?? ($user ? $user->email : null))
             ->first();
@@ -256,17 +238,16 @@ class MainController extends Controller
         if ($existingApplication) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'You have already submitted an application for this mission. Please check your email for application status.',
+                'message' => 'You have already submitted an application for this mission',
                 'duplicate' => true
-            ], 409); // 409 = Conflict
+            ], 409);
         }
 
-        // 3. ابدأ Transaction (عشان لو صار خطأ نرجع كل شي)
         DB::beginTransaction();
 
         try {
-            // 4. احفظ البيانات الأساسية في health_staff
             $healthStaff = HealthStaff::create([
+                'user_id' => $user ? $user->id : null,
                 'task_id' => $request->mission_id,
                 'human_type_id' => $request->human_type,
                 'specialization_id' => $request->specialization,
@@ -293,15 +274,14 @@ class MainController extends Controller
                 'published_scientific_papers' => $request->published_scientific_papers,
                 'conference_participation' => $request->conference_participation,
                 'application_status' => 'pending',
-                'state_application' => 1, // 1 = Pending من جدول application_states
             ]);
 
-            // 5. احفظ اللغات (many-to-many)
+            // Save languages
             if ($request->has('languages_spoken')) {
-                $healthStaff->languages()->sync($request->languages_spoken);
+                $healthStaff->languages()->attach($request->languages_spoken);
             }
 
-            // 6. احفظ الملفات
+            // Save files
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $file) {
                     $originalName = $file->getClientOriginalName();
@@ -318,7 +298,7 @@ class MainController extends Controller
                 }
             }
 
-            // 7. احفظ الأطباء الي اشتغل معاهم
+            // Save doctors worked with
             if ($request->has('doctors') && is_array($request->doctors)) {
                 foreach ($request->doctors as $doctor) {
                     if (!empty($doctor['doctor_name']) && !empty($doctor['visited_date'])) {
@@ -331,58 +311,34 @@ class MainController extends Controller
                 }
             }
 
-            // 8. خلص كل شي بنجاح - اعمل Commit
             DB::commit();
 
-            // 9. ارجع response ناجح
             return response()->json([
                 'status' => 'success',
                 'message' => 'Application submitted successfully!',
-                'redirect' => url('/application/success/' . $healthStaff->id)
+                'redirect' => route('application.success', ['id' => $healthStaff->id])
             ], 200);
 
         } catch (\Exception $e) {
-            // 10. إذا صار خطأ - ارجع كل شي (Rollback)
             DB::rollBack();
 
-            // 11. سجل الخطأ في الـ log
-            \Log::error('Mission Application Error: ' . $e->getMessage(), [
-                'mission_id' => $request->mission_id ?? 'N/A',
-                'email' => $request->email ?? 'N/A',
+            \Log::error('Application Submission Error: ' . $e->getMessage(), [
+                'user_id' => $user ? $user->id : null,
+                'mission_id' => $request->mission_id,
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // 12. تحديد نوع الخطأ ورسالة واضحة
-            $errorMessage = 'An error occurred while submitting your application. Please try again.';
-
-            // إذا كان الخطأ متعلق بـ database constraint (تقديم مكرر)
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false ||
-                strpos($e->getMessage(), 'UNIQUE constraint') !== false) {
-                $errorMessage = 'You have already submitted an application for this mission.';
-            }
-
-            // إذا كان الخطأ متعلق بالملفات
-            if (strpos($e->getMessage(), 'file') !== false ||
-                strpos($e->getMessage(), 'storage') !== false) {
-                $errorMessage = 'Error uploading files. Please check file size and format.';
-            }
-
             return response()->json([
                 'status' => 'error',
-                'message' => $errorMessage,
-                'error' => config('app.debug') ? $e->getMessage() : null,
-                'debug_info' => config('app.debug') ? [
-                    'line' => $e->getLine(),
-                    'file' => $e->getFile()
-                ] : null
+                'message' => 'An error occurred while submitting your application. Please try again.',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
 
     public function applicationSuccess($id)
     {
-        $application = HealthStaff::with(['task', 'humanType', 'specialization'])
-            ->findOrFail($id);
+        $application = HealthStaff::with(['task', 'humanType', 'specialization'])->findOrFail($id);
 
         return view('unauthorized.pages.application-success', compact('application'));
     }
@@ -395,7 +351,7 @@ class MainController extends Controller
             'specialization',
             'languages',
             'files',
-            'workedWithDoctors'
+            'workedWith'
         ])->findOrFail($id);
 
         // Check if user owns this application
@@ -415,7 +371,7 @@ class MainController extends Controller
             'specialization',
             'languages',
             'files',
-            'workedWithDoctors'
+            'workedWith'
         ])->findOrFail($id);
 
         // Check if user owns this application
@@ -449,9 +405,8 @@ class MainController extends Controller
             $request->merge(['languages_spoken' => [$request->languages_spoken]]);
         }
 
-        // Validation - same rules as applyToMission
+        // Validation
         $validator = Validator::make($request->all(), [
-            // Required: Mission & Basic Info
             'human_type' => 'required|exists:human_types,id',
             'specialization' => 'required|exists:specializations,id',
             'full_name' => 'required|string|max:255',
@@ -462,32 +417,22 @@ class MainController extends Controller
             'email' => 'nullable|email|max:255',
             'languages_spoken' => 'required|array|min:1',
             'languages_spoken.*' => 'integer|exists:languages,id',
-
-            // Required: Academic Qualifications
             'highest_qualification' => 'required|string|max:255',
             'granting_university' => 'required|string|max:255',
             'degree_granting_country' => 'required|string|max:100',
             'date_of_graduation' => 'required|date',
-
-            // Optional: Professional Experience (nullable)
-            'clinical_experience_years' => 'nullable|integer|min:0',
-            'countries_previously_served' => 'nullable|string',
-            'previous_employers' => 'nullable|string',
-
-            // Optional: Additional Experience (nullable)
-            'disaster_experience' => 'nullable|in:yes,no',
+            'clinical_experience_years' => 'required|integer|min:0',
+            'countries_previously_served' => 'required|string',
+            'previous_employers' => 'required|string',
+            'disaster_experience' => 'required|in:yes,no',
             'disaster_experience_description' => 'required_if:disaster_experience,yes|nullable|string',
-            'volunteer_experience' => 'nullable|in:yes,no',
+            'volunteer_experience' => 'required|in:yes,no',
             'volunteer_experience_description' => 'required_if:volunteer_experience,yes|nullable|string',
-            'visited_gaza' => 'nullable|in:yes,no',
+            'visited_gaza' => 'required|in:yes,no',
             'place_of_work_previous_visit' => 'nullable|string|max:255',
-
-            // Optional: Academic Contributions (nullable)
-            'educational_contributions' => 'nullable|string',
-            'published_scientific_papers' => 'nullable|string',
-            'conference_participation' => 'nullable|string',
-
-            // Optional: Files
+            'educational_contributions' => 'required|string',
+            'published_scientific_papers' => 'required|string',
+            'conference_participation' => 'required|string',
             'files.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
             'doctors.*.doctor_name' => 'nullable|string|max:255',
             'doctors.*.visited_date' => 'nullable|date',
@@ -496,8 +441,8 @@ class MainController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Please complete all required fields',
-                'errors' => $validator->errors()->all()
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
             ], 422);
         }
 

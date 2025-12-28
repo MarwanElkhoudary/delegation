@@ -3,6 +3,13 @@
 // Apply Mission Page Handler
 var KTApplyMission = function () {
 
+    // ✅ Setup AJAX to always send CSRF token
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     // Initialize Select2 for all dropdowns
     const initializeSelect2 = () => {
         console.log('Initializing Select2...');
@@ -39,11 +46,32 @@ var KTApplyMission = function () {
     const loadSpecializationsOnInit = () => {
         var humanTypeId = $('#human_type').val();
 
-        console.log('Auto-loading specializations for role:', humanTypeId);
+        console.log('=== Specialization Loading Debug ===');
+        console.log('Human Type ID from hidden input:', humanTypeId);
+        console.log('Type:', typeof humanTypeId);
 
-        if (humanTypeId) {
-            loadSpecializations(humanTypeId);
+        // ✅ Enhanced validation
+        if (!humanTypeId || humanTypeId === '' || humanTypeId === 'null' || humanTypeId === 'undefined') {
+            console.error('❌ Human Type ID is missing or invalid!');
+
+            Swal.fire({
+                title: 'Missing Information',
+                html: 'Your staff type is not set.<br><br>Please contact the administrator to update your profile.',
+                icon: 'error',
+                confirmButtonText: 'Go Back to Calendar',
+                allowOutsideClick: false,
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            }).then(() => {
+                window.location.href = '/calendar';
+            });
+
+            return;
         }
+
+        console.log('✓ Human Type ID is valid, proceeding to load specializations...');
+        loadSpecializations(humanTypeId);
     };
 
     // Load specializations for given human type
@@ -52,24 +80,42 @@ var KTApplyMission = function () {
 
         console.log('Loading specializations for human_type:', humanTypeId);
 
+        // Get fresh CSRF token
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+        if (!csrfToken) {
+            console.error('❌ CSRF Token not found in page!');
+            Swal.fire({
+                title: "Session Error",
+                text: "Please refresh the page and try again.",
+                icon: "error",
+                confirmButtonText: "Refresh Page"
+            }).then(() => {
+                window.location.reload();
+            });
+            return;
+        }
+
         $.ajax({
             url: '/get_specialization',
             type: 'POST',
             data: {
                 HUMAN_TYPE: humanTypeId,
-                _token: $('meta[name="csrf-token"]').attr('content')
+                _token: csrfToken
             },
             dataType: 'json',
             beforeSend: function() {
                 $specSelect.prop('disabled', true);
                 $specSelect.next('.spinner-border').remove();
                 $specSelect.parent().append('<span class="spinner-border spinner-border-sm align-middle ms-2"></span>');
+                console.log('⏳ Sending AJAX request...');
             },
             success: function(response) {
                 $specSelect.prop('disabled', false);
                 $('.spinner-border').remove();
 
-                console.log('Specialization response:', response);
+                console.log('✓ AJAX Success!');
+                console.log('Response:', response);
 
                 if (response.status === 'success' && response.data && response.data.length > 0) {
                     $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>');
@@ -79,330 +125,274 @@ var KTApplyMission = function () {
                     });
 
                     $specSelect.trigger('change');
+                    console.log('✓ Specializations loaded successfully! Total:', response.data.length);
                 } else {
+                    console.warn('⚠️ No specializations found');
                     Swal.fire({
                         text: "No specializations found for this role.",
                         icon: "warning",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-primary"
-                        }
+                        confirmButtonText: "Ok"
                     });
-                    $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>').trigger('change');
+                    $specSelect.empty().append('<option value="" disabled selected>No Specializations Available</option>').trigger('change');
                 }
             },
             error: function(xhr, status, error) {
                 $specSelect.prop('disabled', false);
                 $('.spinner-border').remove();
-                console.error('AJAX Error:', error, xhr);
+
+                console.error('❌ AJAX Error');
+                console.error('Status Code:', xhr.status);
+                console.error('Response:', xhr.responseText);
+
+                let errorMessage = 'Failed to load specializations. ';
+
+                if (xhr.status === 419) {
+                    errorMessage = 'Your session has expired. The page will refresh automatically.';
+                    Swal.fire({
+                        title: "Session Expired",
+                        text: errorMessage,
+                        icon: "error",
+                        confirmButtonText: "Refresh Now",
+                        allowOutsideClick: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    return;
+                } else if (xhr.status === 404) {
+                    errorMessage += 'Endpoint not found.';
+                } else if (xhr.status === 500) {
+                    errorMessage += 'Server error.';
+                } else if (xhr.status === 0) {
+                    errorMessage += 'Network error.';
+                } else {
+                    errorMessage += 'Please try again.';
+                }
 
                 Swal.fire({
-                    text: "Failed to load specializations. Please try again.",
+                    title: "Error",
+                    text: errorMessage,
                     icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn btn-primary"
-                    }
+                    confirmButtonText: "Ok"
                 });
-                $specSelect.empty().append('<option value="" disabled selected>Select Your Specialization</option>').trigger('change');
+
+                $specSelect.empty().append('<option value="" disabled selected>Error Loading</option>').trigger('change');
             }
         });
     };
 
-    // Toggle conditional field visibility
-    const toggleField = (yesRadio, noRadio, row, field) => {
-        if (row && field) {
-            if (yesRadio && yesRadio.checked) {
-                row.style.display = 'block';
-                field.setAttribute('required', 'required');
-            } else {
-                row.style.display = 'none';
-                field.removeAttribute('required');
-                field.value = '';
-            }
-        }
-    };
-
-    // Initialize conditional fields
+    // ✅ Initialize conditional fields - works for both apply and edit pages
     const initializeConditionalFields = () => {
-        // Disaster Experience Toggle
-        const yesRadioDisaster = document.getElementById('disaster_experience_yes');
-        const noRadioDisaster = document.getElementById('disaster_experience_no');
-        const descriptionRowDisaster = document.getElementById('disaster_experience_description_row');
-        const descriptionTextareaDisaster = document.getElementById('disaster_experience_description');
+        console.log('Initializing conditional fields...');
 
-        function toggleDisasterDescriptionField() {
-            toggleField(yesRadioDisaster, noRadioDisaster, descriptionRowDisaster, descriptionTextareaDisaster);
-        }
+        // Disaster experience
+        $('input[name="disaster_experience"]').on('change', function() {
+            const value = $(this).val();
+            console.log('Disaster experience changed to:', value);
 
-        if (yesRadioDisaster && noRadioDisaster) {
-            yesRadioDisaster.addEventListener('change', toggleDisasterDescriptionField);
-            noRadioDisaster.addEventListener('change', toggleDisasterDescriptionField);
-            toggleDisasterDescriptionField();
-        }
+            // Support both wrapper IDs (apply-mission and edit-application)
+            const $wrapper = $('#disaster_experience_description_wrapper, #disaster_experience_description_row');
+            const $field = $('#disaster_experience_description');
 
-        // Volunteer Experience Toggle
-        const yesRadioVolunteer = document.getElementById('volunteer_experience_yes');
-        const noRadioVolunteer = document.getElementById('volunteer_experience_no');
-        const descriptionRowVolunteer = document.getElementById('volunteer_experience_description_row');
-        const descriptionTextareaVolunteer = document.getElementById('volunteer_experience_description');
+            if (value === 'yes') {
+                $wrapper.removeClass('d-none').show();
+                $field.prop('disabled', false);
+                console.log('Showing disaster description field');
+            } else {
+                $wrapper.addClass('d-none').hide();
+                $field.prop('disabled', true).val('');
+                console.log('Hiding disaster description field');
+            }
+        });
 
-        function toggleVolunteerDescriptionField() {
-            toggleField(yesRadioVolunteer, noRadioVolunteer, descriptionRowVolunteer, descriptionTextareaVolunteer);
-        }
+        // Volunteer experience
+        $('input[name="volunteer_experience"]').on('change', function() {
+            const value = $(this).val();
+            console.log('Volunteer experience changed to:', value);
 
-        if (yesRadioVolunteer && noRadioVolunteer) {
-            yesRadioVolunteer.addEventListener('change', toggleVolunteerDescriptionField);
-            noRadioVolunteer.addEventListener('change', toggleVolunteerDescriptionField);
-            toggleVolunteerDescriptionField();
-        }
+            // Support both wrapper IDs
+            const $wrapper = $('#volunteer_experience_description_wrapper, #volunteer_experience_description_row');
+            const $field = $('#volunteer_experience_description');
+
+            if (value === 'yes') {
+                $wrapper.removeClass('d-none').show();
+                $field.prop('disabled', false);
+                console.log('Showing volunteer description field');
+            } else {
+                $wrapper.addClass('d-none').hide();
+                $field.prop('disabled', true).val('');
+                console.log('Hiding volunteer description field');
+            }
+        });
+
+        // Gaza visit
+        $('input[name="visited_gaza"]').on('change', function() {
+            const value = $(this).val();
+            console.log('Visited Gaza changed to:', value);
+
+            // Support both wrapper IDs
+            const $wrapper = $('#place_of_work_wrapper, #place_of_work_row');
+            const $field = $('#place_of_work_previous_visit');
+
+            if (value === 'yes') {
+                $wrapper.removeClass('d-none').show();
+                $field.prop('disabled', false);
+                console.log('Showing place of work field');
+            } else {
+                $wrapper.addClass('d-none').hide();
+                $field.prop('disabled', true).val('');
+                console.log('Hiding place of work field');
+            }
+        });
+
+        // ✅ Trigger change on page load to set initial state
+        setTimeout(function() {
+            $('input[name="disaster_experience"]:checked').trigger('change');
+            $('input[name="volunteer_experience"]:checked').trigger('change');
+            $('input[name="visited_gaza"]:checked').trigger('change');
+        }, 100);
+
+        console.log('Conditional fields initialized successfully!');
     };
 
-    // Initialize form repeater
+    // Initialize form repeater for doctors
     const initializeRepeater = () => {
-        console.log('Initializing repeater...');
-
-        const repeaterElement = $('#kt_docs_repeater_basic_doctors');
-        console.log('Repeater element found:', repeaterElement.length > 0);
-
-        if (repeaterElement.length === 0) {
-            console.error('Repeater element not found!');
-            return;
-        }
-
-        try {
-            repeaterElement.repeater({
+        if (typeof $.fn.repeater === 'function') {
+            $('#doctors_repeater').repeater({
                 initEmpty: false,
+                defaultValues: {
+                    'doctor_name': '',
+                    'visited_date': ''
+                },
                 show: function () {
-                    console.log('Show new item');
                     $(this).slideDown();
                 },
                 hide: function (deleteElement) {
-                    console.log('Delete item');
                     $(this).slideUp(deleteElement);
                 }
             });
-            console.log('Form repeater initialized successfully');
-        } catch (e) {
-            console.error('Error initializing repeater:', e);
+            console.log('Form repeater initialized');
         }
     };
 
-    // Handle file uploads with preview
+    // Initialize file upload handling
     const initializeFileUpload = () => {
-        const fileInput = document.getElementById('file_input_temp');
-        const filePreview = document.getElementById('file_preview');
-        const fileInputsContainer = document.getElementById('file_inputs_container');
-        let selectedFiles = [];
         const MAX_FILES = 10;
         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        let selectedFiles = [];
 
-        if (!fileInput || !filePreview || !fileInputsContainer) {
-            console.error('File upload elements not found', {
-                fileInput: !!fileInput,
-                filePreview: !!filePreview,
-                fileInputsContainer: !!fileInputsContainer
-            });
-            return;
-        }
-
-        console.log('File upload elements found, initializing...');
-
-        fileInput.addEventListener('change', function(e) {
-            console.log('File input changed, files:', e.target.files.length);
+        $('#file_input_temp').on('change', function(e) {
             const newFiles = Array.from(e.target.files);
 
-            if (newFiles.length === 0) {
-                console.log('No files selected');
-                return;
-            }
-
-            // Check if adding these files would exceed the limit
             if (selectedFiles.length + newFiles.length > MAX_FILES) {
                 Swal.fire({
-                    text: `You can only upload a maximum of ${MAX_FILES} files. You currently have ${selectedFiles.length} file(s) selected.`,
+                    text: `You can only upload a maximum of ${MAX_FILES} files.`,
                     icon: "warning",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn btn-primary"
-                    }
+                    confirmButtonText: "Ok"
                 });
-                fileInput.value = '';
                 return;
             }
 
-            // Validate each file
-            let invalidFiles = [];
             newFiles.forEach(file => {
                 if (file.size > MAX_FILE_SIZE) {
-                    invalidFiles.push(file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + 'MB)');
+                    Swal.fire({
+                        text: `File "${file.name}" exceeds 5MB limit.`,
+                        icon: "warning",
+                        confirmButtonText: "Ok"
+                    });
+                    return;
                 }
-            });
-
-            if (invalidFiles.length > 0) {
-                Swal.fire({
-                    html: `The following files exceed 5MB:<br><br>${invalidFiles.join('<br>')}`,
-                    icon: "warning",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn btn-primary"
-                    }
-                });
-                fileInput.value = '';
-                return;
-            }
-
-            // Add new files to the selected files array
-            newFiles.forEach(file => {
                 selectedFiles.push(file);
             });
 
-            console.log('Files added. Total:', selectedFiles.length);
-
-            // Clear the temp input
-            fileInput.value = '';
-
-            // Update the display and actual inputs
-            updateDisplay();
+            updateFilePreview();
+            $(this).val('');
         });
 
-        // Use event delegation for remove buttons
-        filePreview.addEventListener('click', function(e) {
-            if (e.target.classList.contains('file-item-remove')) {
-                const index = parseInt(e.target.closest('.file-item').getAttribute('data-index'));
-                console.log('Remove button clicked for index:', index);
-                removeFile(index);
-            }
-        });
+        function updateFilePreview() {
+            const previewContainer = $('#file_preview');
+            const inputsContainer = $('#file_inputs_container');
 
-        function removeFile(index) {
-            console.log('Removing file at index:', index);
-            if (index >= 0 && index < selectedFiles.length) {
-                const removedFile = selectedFiles[index];
-                console.log('Removing file:', removedFile.name);
-                selectedFiles.splice(index, 1);
-                updateDisplay();
-                console.log('File removed. Remaining:', selectedFiles.length);
-            } else {
-                console.error('Invalid index:', index, 'Total files:', selectedFiles.length);
-            }
-        }
+            previewContainer.empty();
+            inputsContainer.empty();
 
-        function updateDisplay() {
-            console.log('Updating display with', selectedFiles.length, 'files');
+            selectedFiles.forEach((file, index) => {
+                const fileItem = $(`
+                    <div class="file-item">
+                        <div class="file-item-info">
+                            <i class="ki-duotone ki-file fs-2x">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <div>
+                                <div class="fw-bold">${file.name}</div>
+                                <div class="text-muted fs-7">${(file.size / 1024).toFixed(2)} KB</div>
+                            </div>
+                        </div>
+                        <span class="file-remove-btn" data-index="${index}">
+                            <i class="ki-duotone ki-cross fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </span>
+                    </div>
+                `);
+                previewContainer.append(fileItem);
 
-            // Update preview
-            if (selectedFiles.length === 0) {
-                filePreview.classList.remove('active');
-                filePreview.innerHTML = '';
-            } else {
-                filePreview.classList.add('active');
-                let html = '<div class="mb-2"><strong>Selected Files (' + selectedFiles.length + '/' + MAX_FILES + '):</strong></div>';
-
-                selectedFiles.forEach(function(file, index) {
-                    const fileSize = (file.size / 1024).toFixed(2);
-                    const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-                    const displaySize = file.size >= 1048576 ? fileSizeMB + ' MB' : fileSize + ' KB';
-
-                    // Escape HTML in filename
-                    const safeName = file.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-                    html += '<div class="file-item" data-index="' + index + '">';
-                    html += '<span class="file-item-name">' + safeName + '</span>';
-                    html += '<span class="file-item-size">' + displaySize + '</span>';
-                    html += '<span class="file-item-remove" title="Remove file">×</span>';
-                    html += '</div>';
-                });
-
-                filePreview.innerHTML = html;
-            }
-
-            // Update actual file inputs
-            fileInputsContainer.innerHTML = '';
-
-            const dataTransfer = new DataTransfer();
-            selectedFiles.forEach(function(file) {
+                const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
+
+                const fileInput = $(`<input type="file" name="files[]" class="d-none" />`);
+                fileInput[0].files = dataTransfer.files;
+                inputsContainer.append(fileInput);
             });
 
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'file';
-            hiddenInput.name = 'files[]';
-            hiddenInput.multiple = true;
-            hiddenInput.style.display = 'none';
-            hiddenInput.files = dataTransfer.files;
-
-            fileInputsContainer.appendChild(hiddenInput);
-
-            console.log('Actual inputs updated. Files in input:', hiddenInput.files.length);
+            $('.file-remove-btn').on('click', function() {
+                const index = $(this).data('index');
+                selectedFiles.splice(index, 1);
+                updateFilePreview();
+            });
         }
-
-        console.log('File upload initialized successfully');
     };
 
-    // Handle form submission with AJAX
+    // ✅ Handle form submission with improved error display
     const handleFormSubmit = () => {
         const form = document.getElementById('apply_mission_form');
-        const submitBtn = document.getElementById('submit_btn');
-
-        if (!form || !submitBtn) {
-            console.error('Form or submit button not found');
-            return;
-        }
+        const submitButton = document.getElementById('submit_btn');
 
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); // منع الإرسال العادي
+            e.preventDefault();
 
-            // Basic validation
-            const requiredFields = form.querySelectorAll('[required]');
-            let hasError = false;
-
-            requiredFields.forEach(field => {
-                if (!field.value || (field.type === 'radio' && !form.querySelector(`input[name="${field.name}"]:checked`))) {
-                    hasError = true;
-                }
-            });
-
-            if (hasError) {
+            const humanTypeId = $('#human_type').val();
+            if (!humanTypeId || humanTypeId === '' || humanTypeId === 'null') {
                 Swal.fire({
-                    text: "Please fill in all required fields.",
-                    icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn btn-primary"
-                    }
+                    title: 'Cannot Submit',
+                    text: 'Your staff type is missing. Please contact the administrator.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
                 });
-                return;
+                return false;
             }
 
-            // Show loading state
-            submitBtn.setAttribute('data-kt-indicator', 'on');
-            submitBtn.disabled = true;
+            submitButton.setAttribute('data-kt-indicator', 'on');
+            submitButton.disabled = true;
 
-            console.log('Form submitting...');
-
-            // إرسال الفورم بـ AJAX
             const formData = new FormData(form);
 
+            console.log('Submitting application...');
+
             $.ajax({
-                url: form.action,
+                url: '/apply_to_mission',
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    console.log('Success response:', response);
+                    submitButton.removeAttribute('data-kt-indicator');
+                    submitButton.disabled = false;
 
-                    submitBtn.removeAttribute('data-kt-indicator');
-                    submitBtn.disabled = false;
+                    console.log('Application submitted successfully:', response);
 
                     if (response.status === 'success') {
-                        // عرض رسالة نجاح
                         Swal.fire({
                             text: response.message || "Application submitted successfully!",
                             icon: "success",
@@ -410,23 +400,15 @@ var KTApplyMission = function () {
                             confirmButtonText: "Ok, got it!",
                             customClass: {
                                 confirmButton: "btn btn-primary"
-                            },
-                            allowOutsideClick: false,
-                            allowEscapeKey: false
-                        }).then(function(result) {
-                            // التحويل للصفحة المطلوبة بعد الضغط على OK
-                            if (result.isConfirmed) {
-                                if (response.redirect) {
-                                    window.location.href = response.redirect;
-                                } else {
-                                    window.location.href = '/calendar';
-                                }
+                            }
+                        }).then(() => {
+                            if (response.redirect) {
+                                window.location.href = response.redirect;
                             }
                         });
                     } else {
-                        // في حالة status مش success
                         Swal.fire({
-                            text: response.message || "An error occurred",
+                            text: response.message || "Something went wrong!",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -436,89 +418,75 @@ var KTApplyMission = function () {
                         });
                     }
                 },
-                error: function(xhr) {
-                    console.error('Error response:', xhr);
+                error: function(xhr, status, error) {
+                    submitButton.removeAttribute('data-kt-indicator');
+                    submitButton.disabled = false;
 
-                    submitBtn.removeAttribute('data-kt-indicator');
-                    submitBtn.disabled = false;
+                    console.error('Application submission error:', xhr.responseJSON);
 
-                    let errorMessage = 'An error occurred. Please try again.';
+                    let errorHtml = '';
 
-                    if (xhr.responseJSON) {
-                        if (xhr.responseJSON.message) {
-                            errorMessage = '<h4 class="mb-4">' + xhr.responseJSON.message + '</h4>';
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        const errorList = [];
+
+                        // Collect all errors
+                        for (let field in errors) {
+                            errors[field].forEach(err => {
+                                errorList.push(err);
+                            });
                         }
 
-                        // عرض أخطاء الـ validation بطريقة منظمة
-                        if (xhr.responseJSON.errors) {
-                            let organizedErrors = xhr.responseJSON.errors;
-                            let errorSections = '';
+                        // ✅ Display errors nicely
+                        if (errorList.length > 0) {
+                            errorHtml = '<div class="text-start">';
+                            errorHtml += '<p class="fw-bold mb-3">Please correct the following errors:</p>';
+                            errorHtml += '<ul class="text-danger" style="list-style: none; padding: 0;">';
 
-                            // عناوين الأقسام بالعربي
-                            const sectionTitles = {
-                                'basic_info': '📋 Basic Information',
-                                'qualifications': '🎓 Academic Qualifications',
-                                'experience': '💼 Professional Experience',
-                                'other': '📌 Other Fields'
-                            };
-
-                            // عرض الأخطاء حسب الأقسام
-                            $.each(organizedErrors, function(section, messages) {
-                                if (messages.length > 0) {
-                                    errorSections += '<div class="mb-4">';
-                                    errorSections += '<h5 class="text-dark fw-bold mb-2">' + (sectionTitles[section] || section) + '</h5>';
-                                    errorSections += '<ul class="text-start mb-0">';
-                                    $.each(messages, function(index, message) {
-                                        errorSections += '<li class="text-muted">' + message + '</li>';
-                                    });
-                                    errorSections += '</ul>';
-                                    errorSections += '</div>';
-                                }
+                            errorList.forEach(err => {
+                                errorHtml += `<li class="mb-2">
+                                    <i class="ki-duotone ki-cross-circle fs-4 me-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    ${err}
+                                </li>`;
                             });
 
-                            errorMessage += errorSections;
+                            errorHtml += '</ul></div>';
                         }
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorHtml = xhr.responseJSON.message;
+                    } else {
+                        errorHtml = "An error occurred while submitting your application. Please try again.";
                     }
 
+                    // ✅ Beautiful display with SweetAlert2
                     Swal.fire({
-                        html: errorMessage,
-                        icon: "error",
-                        width: '600px',
+                        title: 'Validation Error',
+                        html: errorHtml,
+                        icon: "warning",
                         buttonsStyling: false,
-                        confirmButtonText: "Ok, I'll fix it!",
+                        confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-primary",
-                            popup: 'text-start'
-                        }
+                            confirmButton: "btn btn-primary"
+                        },
+                        width: '600px'
                     });
                 }
             });
+
+            return false;
         });
     };
 
     // Public methods
     return {
-        init: function () {
-            console.log('Initializing Apply Mission Page...');
+        init: function() {
+            console.log('=== Apply Mission Page Initialization ===');
 
-            // Check for required plugins
-            if (typeof $.fn.select2 === 'undefined') {
-                console.error("Select2 plugin not loaded");
-                return;
-            }
-            if (typeof Swal === 'undefined') {
-                console.error("SweetAlert2 plugin not loaded");
-                return;
-            }
-            if (typeof $.fn.repeater === 'undefined') {
-                console.error("Form Repeater plugin not loaded");
-                return;
-            }
-
-            // Initialize all components
             initializeSelect2();
 
-            // Auto-load specializations after Select2 is initialized
             setTimeout(function() {
                 loadSpecializationsOnInit();
             }, 300);

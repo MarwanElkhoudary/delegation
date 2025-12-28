@@ -5,6 +5,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\HealthStaffRegistrationController;
+use App\Http\Controllers\HealthStaffManagementController;
 use Illuminate\Support\Facades\Route;
 
 // ========== Health Staff Registration Route ==========
@@ -65,11 +66,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/medical_needs/{task_is}', 'medical_needs');
     });
 
-    Route::controller(CandidateController::class)->prefix('health_staff')->name('health_staff.')->group(function () {
-        Route::get('/', 'index')->name('index'); // for health staff listing
-        Route::get('/doctors', 'doctors')->name('doctors'); // for doctors listing
-        Route::get('/personal-detail', 'personalDetail')->name('personalDetail'); // for personal detail
-
+    Route::controller(HealthStaffManagementController::class)->prefix('health_staff')->name('health_staff.')->group(function () {
+        Route::get('/', 'index')->name('index'); // Dashboard with stats
+        Route::get('/doctors', 'doctors')->name('doctors'); // All applications with filters
+        Route::get('/personal-detail/{id}', 'personalDetail')->name('personalDetail'); // Application details
+        Route::post('/update-status/{id}', 'updateStatus')->name('updateStatus'); // Update single application
+        Route::post('/bulk-update-status', 'bulkUpdateStatus')->name('bulkUpdateStatus'); // Bulk update
+        Route::get('/export', 'export')->name('export'); // Export to Excel
     });
 });
 
