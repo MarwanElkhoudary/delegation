@@ -22,7 +22,7 @@ Route::post('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/', [TaskController::class, 'index'])->middleware(['auth', 'verified']); // for task listing
+Route::get('/', [TaskController::class, 'index'])->middleware(['auth', 'verified'])->name('missions.index'); // for mission listing
 
 // ========== Protected Routes (Require Authentication) ==========
 Route::middleware(['auth'])->group(function () {
@@ -50,22 +50,22 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::controller(TaskController::class)->prefix('tasks')->name('task.')->group(function () {
-        Route::get('/', 'index')->name('index'); // for task listing
-        Route::get('/export', 'export')->name('export'); // for task listing
+    Route::controller(TaskController::class)->prefix('missions')->name('mission.')->group(function () {
+        Route::get('/', 'index')->name('index'); // for mission listing
+        Route::get('/export', 'export')->name('export'); // for mission export
         Route::get('/add', 'create')->name('create');
         Route::get('/show_events', 'show_events')->name('show_events');
         Route::get('/get_events', 'get_events')->name('get_events');
-        Route::get('/view_task/{id}', 'show');
-        Route::get('/edit_task/{id}', 'edit');
-        Route::put('/edit_task_status/{id}', 'edit_task_status')->name('edit_task_status');
-        Route::put('/edit_task_internation/{id}', 'edit_task_internation')->name('edit_task_internation');
-        Route::put('/task_update/{id}', 'update')->name('update');
-        Route::get('/delete_task/{id}', 'destroy');
+        Route::get('/view_mission/{id}', 'show');
+        Route::get('/edit_mission/{id}', 'edit');
+        Route::put('/edit_mission_status/{id}', 'edit_task_status')->name('edit_mission_status');
+        Route::put('/edit_mission_internation/{id}', 'edit_task_internation')->name('edit_mission_internation');
+        Route::put('/mission_update/{id}', 'update')->name('update');
+        Route::get('/delete_mission/{id}', 'destroy');
         Route::post('/', 'store')->name('store');
         Route::post('/get_specialization', 'get_specialization');
         Route::post('/list', 'list');
-        Route::get('/medical_needs/{task_is}', 'medical_needs');
+        Route::get('/medical_needs/{mission_id}', 'medical_needs');
     });
 
     Route::controller(HealthStaffManagementController::class)->prefix('health_staff')->name('health_staff.')->group(function () {

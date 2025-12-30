@@ -10,10 +10,10 @@ let result_arr = [];
 function fetchMedicalNeeds() {
     return new Promise((resolve, reject) => {
         if (id) {
-            console.log('Fetching medical needs from:', BASE_URL + '/tasks/medical_needs/' + id);
+            console.log('Fetching medical needs from:', BASE_URL + '/missions/medical_needs/' + id);
             $.ajax({
                 type: 'GET',
-                url: BASE_URL + '/tasks/medical_needs/' + id,
+                url: BASE_URL + '/missions/medical_needs/' + id,
                 dataType: 'json',
                 success: function (mm) {
                     console.log('Medical Needs Data:', mm);
@@ -99,11 +99,11 @@ $(document).ready(function () {
             return;
         }
 
-        console.log('Making AJAX call to:', BASE_URL + '/tasks/get_specialization');
+        console.log('Making AJAX call to:', BASE_URL + '/missions/get_specialization');
         console.log('With data:', { 'HUMAN_TYPE': selectedValue, "_token": TOKEN });
         $.ajax({
             type: 'POST',
-            url: BASE_URL + '/tasks/get_specialization',
+            url: BASE_URL + '/missions/get_specialization',
             data: { 'HUMAN_TYPE': selectedValue, "_token": TOKEN },
             dataType: 'json',
             success: function (result) {

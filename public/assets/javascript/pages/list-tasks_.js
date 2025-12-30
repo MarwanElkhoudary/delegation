@@ -19,7 +19,7 @@ var KTDatatablesServerSide = function () {
             // order: [[5, 'desc']],
             // stateSave: true,
             ajax: {
-                url: BASE_URL + '/tasks/list',
+                url: BASE_URL + '/missions/list',
                 type:'POST',
                 data : {"_token": TOKEN},
             },
@@ -68,7 +68,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="`+BASE_URL+`/tasks/delete_task/`+row.id+`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="`+BASE_URL+`/missions/delete_mission/`+row.id+`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -88,7 +88,7 @@ var KTDatatablesServerSide = function () {
                     targets: 2,
                     render: function (data, type, row) {
                         return `
-                            <a href="`+ BASE_URL+`/tasks/view_task/`+row.id+`" class="text-gray-800 text-hover-primary mb-1" >`
+                            <a href="`+ BASE_URL+`/missions/view_mission/`+row.id+`" class="text-gray-800 text-hover-primary mb-1" >`
                             +data+
                             `</a>
                             <!--end::Menu-->

@@ -1,20 +1,97 @@
+@extends('master')
+@section('css')
+    <link href="{{ asset('assets')  }}/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
 
-<?php $__env->startSection('css'); ?>
-    <link href="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+    <style>
+        a[aria-disabled="true"] {
+            color: gray;
+            pointer-events: none;
+            text-decoration: none;
+        }
+    </style>
 
-<?php $__env->stopSection(); ?>
-<?php $__env->startSection('role_user', 'International Cooperation Account'); ?>
-<?php $__env->startSection('main-title', 'Missions'); ?>
-<?php $__env->startSection('sub-title', 'Show Missions'); ?>
-<?php $__env->startSection('content'); ?>
+@endsection
+@section('role_user', 'Hospital Account')
+@section('main-title', 'Missions')
+@section('sub-title', 'Show Missions')
+
+@section('content')
     <!--begin::Toolbar-->
+
+    @if (session('message'))
+        <!--begin::Alert-->
+        <div class="alert alert-success d-flex align-items-center p-5">
+            <!--begin::Icon-->
+            <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+            <!--end::Icon-->
+
+            <!--begin::Wrapper-->
+            <div class="d-flex flex-column">
+                <!--begin::Title-->
+                <h4 class="mb-1 text-dark">Success</h4>
+                <!--end::Title-->
+
+                <!--begin::Content-->
+                <span> {{ session('message') }}</span>
+                <!--end::Content-->
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Alert-->
+    @endif
+    <!--begin::General options-->
+    @if (session('message_delete'))
+        <!--begin::Alert-->
+        <div class="alert alert-danger d-flex align-items-center p-5">
+            <!--begin::Icon-->
+            <i class="ki-duotone ki-shield-tick fs-2hx text-danger me-4"><span class="path1"></span><span class="path2"></span></i>
+            <!--end::Icon-->
+
+            <!--begin::Wrapper-->
+            <div class="d-flex flex-column">
+                <!--begin::Title-->
+                <h4 class="mb-1 text-dark">Success deleting</h4>
+                <!--end::Title-->
+
+                <!--begin::Content-->
+                <span> {{ session('message_delete') }}</span>
+                <!--end::Content-->
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Alert-->
+    @endif
+
+    @if (session('message_edit'))
+        <!--begin::Alert-->
+        <div class="alert alert-info d-flex align-items-center p-5">
+            <!--begin::Icon-->
+            <i class="ki-duotone ki-shield-tick fs-2hx text-info me-4"><span class="path1"></span><span class="path2"></span></i>
+            <!--end::Icon-->
+
+            <!--begin::Wrapper-->
+            <div class="d-flex flex-column">
+                <!--begin::Title-->
+                <h4 class="mb-1 text-dark">Success Editing</h4>
+                <!--end::Title-->
+
+                <!--begin::Content-->
+                <span> {{ session('message_edit') }}</span>
+                <!--end::Content-->
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Alert-->
+    @endif
+
+
     <div class="d-flex justify-content-end" data-kt-docs-table-toolbar="base">
 
         <!--begin::Add customer-->
-        
-        
-        
-        
+        <a href="{{url('missions/add')}}" class="btn btn-primary" data-bs-toggle="add new Mission">
+            <i class="ki-duotone ki-plus fs-2"></i>
+            Add Mission
+        </a>
         <!--end::Add customer-->
     </div>
     <!--end::Toolbar-->
@@ -41,7 +118,7 @@
                     <!--begin::Toolbar-->
                     <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
                         <!--begin::Export dropdown-->
-                        <form action="<?php echo e(route('task.export')); ?>" method="GET">
+                        <form action="{{route('mission.export')}}" method="GET">
                             <button type="submit" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                 <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
                                 Export Report
@@ -108,7 +185,6 @@
                     <tr class="fw-semibold fs-6 text-gray-800">
                         <th class="min-w-50px" data-priority="2">#</th>
                         <th class="min-w-50px" >Mission ID</th>
-                        <th class="min-w-50px" >Hospital Name</th>
                         <th class="min-w-150px">Specialization</th>
                         <th class="min-w-70px">Priority</th>
                         <th class="min-w-150px">Target Specialization</th>
@@ -117,6 +193,7 @@
                         <th  class="min-w-150px">Start Date</th>
                         <th  class="min-w-150px">End Date</th>
                         <th class="min-w-120px">Status</th>
+                        <th class="mw-100px" data-priority="1">Action</th>
                     </tr>
 
                     </thead>
@@ -133,22 +210,22 @@
 
     </div>
 
-<?php $__env->stopSection(); ?>
-<?php $__env->startSection('script'); ?>
+@endsection
+
+
+@section('script')
     <!--begin::Vendors Javascript(used for this page only)-->
-    <script src="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.js"></script>
+    <script src="{{ asset('assets')  }}/plugins/custom/datatables/datatables.bundle.js"></script>
     <!--end::Vendors Javascript-->
     <!--begin::Custom Javascript(used for this page only)-->
     <!--begin::Custom Javascript(used for this page only)-->
-    <script src="<?php echo e(asset('assets')); ?>/js/custom/apps/ecommerce/reports/sales/sales_1.js"></script>
+    <script src="{{ asset('assets')  }}/js/custom/apps/ecommerce/reports/sales/sales_1.js"></script>
     <!--end::Custom Javascript-->
     <!--end::Custom Javascript-->
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('js'); ?>
-    <script src="<?php echo e(asset('assets')); ?>/javascript/pages/International_Cooperation/list-tasks.js"></script>
-<?php $__env->stopSection(); ?>
+@section('js')
+    <script src="{{ asset('assets')  }}/javascript/pages/list-tasks.js"></script>
+@endsection
 
 
-
-<?php echo $__env->make('master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/task/International_Cooperation/index.blade.php ENDPATH**/ ?>

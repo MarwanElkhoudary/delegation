@@ -1,7 +1,5 @@
-@extends('master')
-
-@section('css')
-<link href="{{ asset('assets') }}/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+<?php $__env->startSection('css'); ?>
+<link href="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
 <style>
     /* ============================================
        ENHANCED MISSIONS PAGE STYLES - RESPONSIVE
@@ -441,9 +439,9 @@
         color: #7e8299;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@php
+<?php
     $userRole = Auth::user()->role_id;
     $roleNames = [
         1 => 'Hospital Account',
@@ -457,20 +455,20 @@
     
     // Check if we need hospital column (roles 2 and 3)
     $showHospitalColumn = in_array($userRole, [2, 3]);
-@endphp
+?>
 
-@section('role_user', $roleName)
-@section('main-title', 'Missions Management')
-@section('sub-title', 'Mission Overview')
+<?php $__env->startSection('role_user', $roleName); ?>
+<?php $__env->startSection('main-title', 'Missions Management'); ?>
+<?php $__env->startSection('sub-title', 'Mission Overview'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <!-- Loading Overlay -->
 <div class="loading-overlay" id="loadingOverlay" style="display: none;">
     <div class="loading-spinner"></div>
 </div>
 
 <!-- Alerts -->
-@if (session('message'))
+<?php if(session('message')): ?>
 <div class="alert alert-success alert-dismissible fade show d-flex align-items-center p-4 mb-4" role="alert" style="border-radius: 12px; border-left: 4px solid #38ef7d;">
     <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4">
         <span class="path1"></span>
@@ -478,13 +476,13 @@
     </i>
     <div class="flex-grow-1">
         <h5 class="mb-1 text-success">Success!</h5>
-        <span>{{ session('message') }}</span>
+        <span><?php echo e(session('message')); ?></span>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
-@endif
+<?php endif; ?>
 
-@if (session('message_delete'))
+<?php if(session('message_delete')): ?>
 <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center p-4 mb-4" role="alert" style="border-radius: 12px; border-left: 4px solid #ff6b6b;">
     <i class="ki-duotone ki-information fs-2hx text-danger me-4">
         <span class="path1"></span>
@@ -493,13 +491,13 @@
     </i>
     <div class="flex-grow-1">
         <h5 class="mb-1 text-danger">Deleted Successfully</h5>
-        <span>{{ session('message_delete') }}</span>
+        <span><?php echo e(session('message_delete')); ?></span>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
-@endif
+<?php endif; ?>
 
-@if (session('message_edit'))
+<?php if(session('message_edit')): ?>
 <div class="alert alert-info alert-dismissible fade show d-flex align-items-center p-4 mb-4" role="alert" style="border-radius: 12px; border-left: 4px solid #4facfe;">
     <i class="ki-duotone ki-check-circle fs-2hx text-info me-4">
         <span class="path1"></span>
@@ -507,11 +505,11 @@
     </i>
     <div class="flex-grow-1">
         <h5 class="mb-1 text-info">Updated Successfully</h5>
-        <span>{{ session('message_edit') }}</span>
+        <span><?php echo e(session('message_edit')); ?></span>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
-@endif
+<?php endif; ?>
 
 <!-- Statistics Cards Row -->
 <div class="row g-4 mb-4">
@@ -615,14 +613,14 @@
             </button>
         </div>
         
-        @if($canAddMission)
+        <?php if($canAddMission): ?>
         <div class="col-lg-2 col-md-6">
-            <a href="{{ url('missions/add') }}" class="btn btn-enhanced btn-success-gradient w-100">
+            <a href="<?php echo e(url('missions/add')); ?>" class="btn btn-enhanced btn-success-gradient w-100">
                 <i class="ki-outline ki-plus fs-3"></i>
                 Add Mission
             </a>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 
@@ -635,7 +633,7 @@
                 <p class="text-white mb-0 opacity-75" style="font-size: 0.9rem;">Manage and track all medical missions</p>
             </div>
             <div>
-                <form action="{{ route('mission.export') }}" method="GET" class="d-inline">
+                <form action="<?php echo e(route('mission.export')); ?>" method="GET" class="d-inline">
                     <button type="submit" class="btn btn-light btn-sm">
                         <i class="ki-duotone ki-exit-down fs-2">
                             <span class="path1"></span>
@@ -656,9 +654,9 @@
                     <tr>
                         <th class="text-center" style="width: 60px;">#</th>
                         <th style="min-width: 100px;">Mission ID</th>
-                        @if($showHospitalColumn)
+                        <?php if($showHospitalColumn): ?>
                         <th style="min-width: 150px;">Hospital</th>
-                        @endif
+                        <?php endif; ?>
                         <th style="min-width: 150px;">Specialization</th>
                         <th class="text-center" style="min-width: 120px;">Priority</th>
                         <th style="min-width: 150px;">Target</th>
@@ -686,9 +684,9 @@
                 <span class="path2"></span>
             </i>
             <h4 class="empty-state-title">No Missions Found</h4>
-            <p class="empty-state-text">Try adjusting your filters@if($canAddMission) or create a new mission@endif</p>
+            <p class="empty-state-text">Try adjusting your filters<?php if($canAddMission): ?> or create a new mission<?php endif; ?></p>
             @if($canAddMission)
-            <a href="{{ url('missions/add') }}" class="btn btn-enhanced btn-primary-gradient mt-3">
+            <a href="<?php echo e(url('missions/add')); ?>" class="btn btn-enhanced btn-primary-gradient mt-3">
                 <i class="ki-outline ki-plus fs-3"></i>
                 Create New Mission
             </a>
@@ -697,21 +695,21 @@
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
-<script src="{{ asset('assets') }}/plugins/custom/datatables/datatables.bundle.js"></script>
-@endsection
+<?php $__env->startSection('script'); ?>
+<script src="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.js"></script>
+<?php $__env->stopSection(); ?>
 
-@section('js')
+<?php $__env->startSection('js'); ?>
 <script>
 // Enhanced Missions DataTable - Shared for all roles
 "use strict";
 
 // Global config from PHP
-const USER_ROLE = {{ $userRole }};
-const CAN_ADD_MISSION = {{ $canAddMission ? 'true' : 'false' }};
-const SHOW_HOSPITAL_COLUMN = {{ $showHospitalColumn ? 'true' : 'false' }};
+const USER_ROLE = <?php echo e($userRole); ?>;
+const CAN_ADD_MISSION = <?php echo e($canAddMission ? 'true' : 'false'); ?>;
+const SHOW_HOSPITAL_COLUMN = <?php echo e($showHospitalColumn ? 'true' : 'false'); ?>;
 
 var EnhancedMissionsTable = function() {
     var table;
@@ -1232,4 +1230,6 @@ setTimeout(function() {
     });
 }, 5000);
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/task/index.blade.php ENDPATH**/ ?>

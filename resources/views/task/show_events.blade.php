@@ -8,7 +8,7 @@
 
 @section('role_user', 'Hospital Account')
 @section('main-title')
-    <a href="{{ route('task.index') }}">Missions</a>
+    <a href="{{ route('mission.index') }}">Missions</a>
 @endsection
 @section('sub-title', 'Show Events')
 

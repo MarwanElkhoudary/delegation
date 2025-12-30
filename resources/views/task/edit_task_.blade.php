@@ -19,7 +19,7 @@
 
         <!--begin::Card body-->
         <div class="card-body pt-0">
-            <form action="{{route('task.update', [$task->id]) }}" class="form mb-15" method="post"
+            <form action="{{route('mission.update', [$task->id]) }}" class="form mb-15" method="post"
                   id="kt_careers_form">
                 @csrf
                 @method('PUT')

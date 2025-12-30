@@ -3,229 +3,206 @@
     <!--begin::Sidebar nav-->
     <div class="app-sidebar-wrapper py-8 py-lg-10" id="kt_app_sidebar_wrapper">
         <!--begin::Nav wrapper-->
-        <div id="kt_app_sidebar_nav_wrapper" class="d-flex flex-column px-8 px-lg-10 hover-scroll-y" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="{default: false, lg: '#kt_app_header'}" data-kt-scroll-wrappers="#kt_app_sidebar, #kt_app_sidebar_wrapper" data-kt-scroll-offset="{default: '10px', lg: '40px'}">
-            <!--begin::Progress-->
-            <div class="d-flex align-items-center flex-column w-100 mb-8 mb-lg-10">
-                <div class="d-flex justify-content-between fw-bolder fs-6 text-gray-800 w-100 mt-auto mb-3">
-                    <span>Your Goal</span>
-                </div>
-                <div class="w-100 bg-light-info rounded mb-2" style="height: 24px">
-                    <div class="bg-info rounded" role="progressbar" style="height: 24px; width: 37%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="fw-semibold fs-7 text-primary w-100 mt-auto">
-                    <span>reached 37% of your target</span>
-                </div>
-            </div>
-            <!--end::Progress-->
-            <!--begin::Stats-->
-
+        <div id="kt_app_sidebar_nav_wrapper" class="d-flex flex-column px-5 px-lg-8 hover-scroll-y" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="{default: false, lg: '#kt_app_header'}" data-kt-scroll-wrappers="#kt_app_sidebar, #kt_app_sidebar_wrapper" data-kt-scroll-offset="{default: '10px', lg: '40px'}">
+            
             <?php
                 use App\Models\Task;
                 if (Auth::user()->role_id == 1){
-                $recently   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 1)->get();
-                $suspended  = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 2)->get();
-                $ongoing    = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 3)->get();
-                $completed  = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 4)->get();
-                $rejected   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 5)->get();
-                $approved   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 6)->get();
-//                                    print_r(count($recently));
+                    $recently   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 1)->get();
+                    $suspended  = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 2)->get();
+                    $ongoing    = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 3)->get();
+                    $completed  = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 4)->get();
+                    $rejected   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 5)->get();
+                    $approved   = Task::where('hospital_id', Auth::user()->hospital_id)->where('status_id', 6)->get();
                 }else if(Auth::user()->role_id == 2){
-                $recently   = Task::where('status_id', 1)->get();
-                $suspended  = Task::where('status_id', 2)->get();
-                $ongoing    = Task::where('status_id', 3)->get();
-                $completed  = Task::where('status_id', 4)->get();
-                $rejected   = Task::where('status_id', 5)->get();
-                $approved   = Task::where('status_id', 6)->get();
+                    $recently   = Task::where('status_id', 1)->get();
+                    $suspended  = Task::where('status_id', 2)->get();
+                    $ongoing    = Task::where('status_id', 3)->get();
+                    $completed  = Task::where('status_id', 4)->get();
+                    $rejected   = Task::where('status_id', 5)->get();
+                    $approved   = Task::where('status_id', 6)->get();
                 }else if(Auth::user()->role_id == 3){
-                $recently   = Task::where('status_id', 1)->get();
-                $suspended  = Task::where('status_id', 2)->get();
-                $ongoing    = Task::where('status_id', 3)->get();
-                $completed  = Task::where('status_id', 4)->get();
-                $rejected   = Task::where('status_id', 5)->get();
-                $approved   = Task::where('status_id', 6)->get();
+                    $recently   = Task::where('status_id', 1)->get();
+                    $suspended  = Task::where('status_id', 2)->get();
+                    $ongoing    = Task::where('status_id', 3)->get();
+                    $completed  = Task::where('status_id', 4)->get();
+                    $rejected   = Task::where('status_id', 5)->get();
+                    $approved   = Task::where('status_id', 6)->get();
                 }
-
+                
+                $totalMissions = count($recently) + count($suspended) + count($ongoing) + count($completed) + count($rejected) + count($approved);
+                $completedPercentage = $totalMissions > 0 ? round((count($completed) / $totalMissions) * 100) : 0;
             ?>
-
-
-            <div class="d-flex mb-8 mb-lg-10">
-                <!--begin::Stat-->
-                <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4 me-6">
-                    <!--begin::Date-->
-                    <span class="fs-6 text-gray-500 fw-bold">Recently</span>
-                    <!--end::Date-->
-                    <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-primary"><?php echo e(count($recently)); ?></div>
-                    <!--end::Label-->
+            
+            <!--begin::Progress Section-->
+            <div class="mb-7">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="ki-outline ki-chart-simple fs-2 text-primary me-2"></i>
+                    <h5 class="fw-bold text-gray-800 mb-0">Mission Progress</h5>
                 </div>
-                <!--end::Stat-->
-                <!--begin::Stat-->
-                <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4">
-                    <!--begin::Date-->
-                    <span class="fs-6 text-gray-500 fw-bold">Approved</span>
-                    <!--end::Date-->
-                    <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-info"><?php echo e(count($approved)); ?></div>
-                    <!--end::Label-->
+                
+                <div class="bg-light-primary rounded p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-gray-700 fw-semibold fs-7">Completion Rate</span>
+                        <span class="badge badge-primary fw-bold"><?php echo e($completedPercentage); ?>%</span>
+                    </div>
+                    
+                    <div class="progress h-6px mb-3">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: <?php echo e($completedPercentage); ?>%"></div>
+                    </div>
+                    
+                    <div class="text-gray-600 fs-8 text-center">
+                        <?php echo e(count($completed)); ?> of <?php echo e($totalMissions); ?> missions completed
+                    </div>
                 </div>
-                <!--end::Stat-->
-
             </div>
-
-            <div class="d-flex mb-8 mb-lg-10">
-                <!--begin::Stat-->
-                <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4">
-                    <!--begin::Date-->
-                    <span class="fs-6 text-gray-500 fw-bold">Ongoing</span>
-                    <!--end::Date-->
-                    <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-warning"><?php echo e(count($ongoing)); ?></div>
-                    <!--end::Label-->
+            <!--end::Progress Section-->
+            
+            <!--begin::Mission Statistics-->
+            <div class="mb-7">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="ki-outline ki-abstract-26 fs-2 text-gray-600 me-2"></i>
+                    <h5 class="fw-bold text-gray-800 mb-0">Mission Statistics</h5>
                 </div>
-                <!--end::Stat-->
-                <!--begin::Stat-->
-                <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4 me-6">
-                    <!--begin::Date-->
-                    <span class="fs-6 text-gray-500 fw-bold">Suspended</span>
-                    <!--end::Date-->
-                    <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-dark"><?php echo e(count($suspended)); ?></div>
-                    <!--end::Label-->
+                
+                <!--begin::Stats Grid-->
+                <div class="d-flex flex-column gap-3">
+                    <!--begin::Recently-->
+                    <div class="d-flex align-items-center bg-light-primary rounded p-3">
+                        <div class="symbol symbol-40px me-3">
+                            <span class="symbol-label bg-primary">
+                                <i class="ki-outline ki-file-added fs-2 text-white"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="text-gray-700 fw-semibold fs-7 d-block">Recently</span>
+                            <span class="text-gray-900 fw-bold fs-3"><?php echo e(count($recently)); ?></span>
+                        </div>
+                    </div>
+                    <!--end::Recently-->
+                    
+                    <!--begin::Approved-->
+                    <div class="d-flex align-items-center bg-light-info rounded p-3">
+                        <div class="symbol symbol-40px me-3">
+                            <span class="symbol-label bg-info">
+                                <i class="ki-outline ki-check-circle fs-2 text-white"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="text-gray-700 fw-semibold fs-7 d-block">Approved</span>
+                            <span class="text-gray-900 fw-bold fs-3"><?php echo e(count($approved)); ?></span>
+                        </div>
+                    </div>
+                    <!--end::Approved-->
+                    
+                    <!--begin::Ongoing-->
+                    <div class="d-flex align-items-center bg-light-warning rounded p-3">
+                        <div class="symbol symbol-40px me-3">
+                            <span class="symbol-label bg-warning">
+                                <i class="ki-outline ki-time fs-2 text-white"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="text-gray-700 fw-semibold fs-7 d-block">Ongoing</span>
+                            <span class="text-gray-900 fw-bold fs-3"><?php echo e(count($ongoing)); ?></span>
+                        </div>
+                    </div>
+                    <!--end::Ongoing-->
+                    
+                    <!--begin::Suspended-->
+                    <div class="d-flex align-items-center bg-light-dark rounded p-3">
+                        <div class="symbol symbol-40px me-3">
+                            <span class="symbol-label bg-dark">
+                                <i class="ki-outline ki-cross-circle fs-2 text-white"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="text-gray-700 fw-semibold fs-7 d-block">Suspended</span>
+                            <span class="text-gray-900 fw-bold fs-3"><?php echo e(count($suspended)); ?></span>
+                        </div>
+                    </div>
+                    <!--end::Suspended-->
+                    
+                    <!--begin::Completed-->
+                    <div class="d-flex align-items-center bg-light-success rounded p-3">
+                        <div class="symbol symbol-40px me-3">
+                            <span class="symbol-label bg-success">
+                                <i class="ki-outline ki-double-check-circle fs-2 text-white"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="text-gray-700 fw-semibold fs-7 d-block">Completed</span>
+                            <span class="text-gray-900 fw-bold fs-3"><?php echo e(count($completed)); ?></span>
+                        </div>
+                    </div>
+                    <!--end::Completed-->
+                    
+                    <!--begin::Rejected-->
+                    <div class="d-flex align-items-center bg-light-danger rounded p-3">
+                        <div class="symbol symbol-40px me-3">
+                            <span class="symbol-label bg-danger">
+                                <i class="ki-outline ki-cross fs-2 text-white"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="text-gray-700 fw-semibold fs-7 d-block">Rejected</span>
+                            <span class="text-gray-900 fw-bold fs-3"><?php echo e(count($rejected)); ?></span>
+                        </div>
+                    </div>
+                    <!--end::Rejected-->
                 </div>
-                <!--end::Stat-->
-
+                <!--end::Stats Grid-->
             </div>
-            <div class="d-flex mb-8 mb-lg-10">
-                <!--begin::Stat-->
-                <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4">
-                    <!--begin::Date-->
-                    <span class="fs-6 text-gray-500 fw-bold">Completed</span>
-                    <!--end::Date-->
-                    <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-success"><?php echo e(count($completed)); ?></div>
-                    <!--end::Label-->
-                </div>
-                <!--end::Stat-->
-                <!--begin::Stat-->
-                <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4 me-6">
-                    <!--begin::Date-->
-                    <span class="fs-6 text-gray-500 fw-bold">Rejected</span>
-                    <!--end::Date-->
-                    <!--begin::Label-->
-                    <div class="fs-2 fw-bold text-danger"><?php echo e(count($rejected)); ?></div>
-                    <!--end::Label-->
-                </div>
-                <!--end::Stat-->
-
-            </div>
-            <!--end::Stats-->
-            <!--begin::Links-->
+            <!--end::Mission Statistics-->
+            
+            <!--begin::Quick Actions-->
             <div class="mb-0">
-                <!--begin::Title-->
-                <h3 class="text-gray-800 fw-bold mb-8">Services</h3>
-                <!--end::Title-->
-                <!--begin::Row-->
-                <div class="row g-5" data-kt-buttons="true" data-kt-buttons-target="[data-kt-button]">
-                    <!--begin::Col-->
-                    <div class="col-6">
-                        <!--begin::Link-->
-                        <a href="<?php echo e(url('/calendar')); ?>" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
-                            <!--begin::Icon-->
-                            <span class="mb-2">
-                                            <i class="ki-outline ki-calendar fs-1"></i>
-                                        </span>
-                            <!--end::Icon-->
-                            <!--begin::Label-->
-                            <span class="fs-7 fw-bold">Calendar</span>
-                            <!--end::Label-->
-                        </a>
-                        <!--end::Link-->
-                    </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <div class="col-6">
-                        <!--begin::Link-->
-                        <a href="<?php echo e(url('/health_staff')); ?>" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
-                            <!--begin::Icon-->
-                            <span class="mb-2">
-                                            <i class="ki-outline ki-tablet-book fs-1"></i>
-                                        </span>
-                            <!--end::Icon-->
-                            <!--begin::Label-->
-                            <span class="fs-7 fw-bold">Health Staff</span>
-                            <!--end::Label-->
-                        </a>
-                        <!--end::Link-->
-                    </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <div class="col-6">
-                        <!--begin::Link-->
-                        <a href="apps/support-center/overview.html" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
-                            <!--begin::Icon-->
-                            <span class="mb-2">
-                                            <i class="ki-outline ki-wifi-home fs-1"></i>
-                                        </span>
-                            <!--end::Icon-->
-                            <!--begin::Label-->
-                            <span class="fs-7 fw-bold">Network</span>
-                            <!--end::Label-->
-                        </a>
-                        <!--end::Link-->
-                    </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <div class="col-6">
-                        <!--begin::Link-->
-                        <a href="apps/projects/list.html" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
-                            <!--begin::Icon-->
-                            <span class="mb-2">
-                                            <i class="ki-outline ki-medal-star fs-1"></i>
-                                        </span>
-                            <!--end::Icon-->
-                            <!--begin::Label-->
-                            <span class="fs-7 fw-bold">Hospitality</span>
-                            <!--end::Label-->
-                        </a>
-                        <!--end::Link-->
-                    </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <div class="col-6">
-                        <!--begin::Link-->
-                        <a href="apps/file-manager/folders.html" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px border-gray-200" data-kt-button="true">
-                            <!--begin::Icon-->
-                            <span class="mb-2">
-                                            <i class="ki-outline ki-setting-2 fs-1"></i>
-                                        </span>
-                            <!--end::Icon-->
-                            <!--begin::Label-->
-                            <span class="fs-7 fw-bold">Utilities</span>
-                            <!--end::Label-->
-                        </a>
-                        <!--end::Link-->
-                    </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <div class="col-6">
-                        <!--begin::Link-->
-                        <a href="apps/file-manager/settings.html" class="btn btn-icon btn-outline btn-bg-light btn-active-light-primary btn-flex flex-column flex-center w-100px h-100px active border-primary border-dashed" data-kt-button="true">
-                            <!--begin::Icon-->
-                            <span class="mb-2">
-                                            <i class="ki-outline ki-plus fs-1"></i>
-                                        </span>
-                            <!--end::Icon-->
-                            <!--begin::Label-->
-                            <span class="fs-7 fw-bold">Add New</span>
-                            <!--end::Label-->
-                        </a>
-                        <!--end::Link-->
-                    </div>
-                    <!--end::Col-->
+                <div class="d-flex align-items-center mb-4">
+                    <i class="ki-outline ki-element-11 fs-2 text-gray-600 me-2"></i>
+                    <h5 class="fw-bold text-gray-800 mb-0">Quick Actions</h5>
                 </div>
-                <!--end::Row-->
+                
+                <!--begin::Actions List-->
+                <div class="d-flex flex-column gap-2">
+                    <!--begin::Missions-->
+                    <a href="<?php echo e(url('/missions')); ?>" class="btn btn-light-primary w-100 d-flex align-items-center justify-content-start">
+                        <i class="ki-outline ki-compass fs-2 me-3"></i>
+                        <span class="fw-bold">Missions</span>
+                    </a>
+                    <!--end::Missions-->
+                    
+                    <!--begin::Calendar-->
+                    <a href="<?php echo e(url('/calendar')); ?>" class="btn btn-light-info w-100 d-flex align-items-center justify-content-start">
+                        <i class="ki-outline ki-calendar fs-2 me-3"></i>
+                        <span class="fw-bold">Calendar</span>
+                    </a>
+                    <!--end::Calendar-->
+                    
+                    <!--begin::Health Staff-->
+                    <a href="<?php echo e(url('/health_staff')); ?>" class="btn btn-light-warning w-100 d-flex align-items-center justify-content-start">
+                        <i class="ki-outline ki-people fs-2 me-3"></i>
+                        <span class="fw-bold">Health Staff</span>
+                    </a>
+                    <!--end::Health Staff-->
+                    
+                    <!--begin::Reports-->
+                    <a href="#" class="btn btn-light-danger w-100 d-flex align-items-center justify-content-start">
+                        <i class="ki-outline ki-chart-simple-2 fs-2 me-3"></i>
+                        <span class="fw-bold">Reports</span>
+                    </a>
+                    <!--end::Reports-->
+                    
+                    <!--begin::Settings-->
+                    <a href="#" class="btn btn-light-secondary w-100 d-flex align-items-center justify-content-start">
+                        <i class="ki-outline ki-setting-2 fs-2 me-3"></i>
+                        <span class="fw-bold">Settings</span>
+                    </a>
+                    <!--end::Settings-->
+                </div>
+                <!--end::Actions List-->
             </div>
-            <!--end::Links-->
+            <!--end::Quick Actions-->
+            
         </div>
         <!--end::Nav wrapper-->
     </div>

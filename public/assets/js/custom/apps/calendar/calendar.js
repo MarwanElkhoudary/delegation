@@ -5,7 +5,7 @@
 //     // Fetch events from Laravel controller
 //     const fetchEvents = (info, successCallback, failureCallback) => {
 //         $.ajax({
-//             url: BASE_URL + '/tasks/get_events',
+//             url: BASE_URL + '/missions/get_events',
 //             method: 'GET',
 //             dataType: 'json',
 //             success: function (events) {
@@ -48,7 +48,7 @@ var KTAppCalendar = function () {
     // Fetch events from Laravel controller
     const fetchEvents = (info, successCallback, failureCallback) => {
         $.ajax({
-            url: BASE_URL + '/tasks/get_events',
+            url: BASE_URL + '/missions/get_events',
             method: 'GET',
             data: {
                 start: info.startStr, // Send date range to filter events
@@ -105,7 +105,7 @@ var KTAppCalendar = function () {
                     editButton.onclick = () => {
                         console.log('Edit event:', event.id);
                         // Example: Redirect to edit page
-                        // window.location.href = `${BASE_URL}/tasks/${event.id}/edit`;
+                        // window.location.href = `${BASE_URL}/missions/${event.id}/edit`;
                     };
 
                     // Handle delete button
@@ -116,7 +116,7 @@ var KTAppCalendar = function () {
                             // Example: AJAX delete request
                             /*
                             $.ajax({
-                                url: BASE_URL + '/tasks/' + event.id,
+                                url: BASE_URL + '/missions/' + event.id,
                                 method: 'DELETE',
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

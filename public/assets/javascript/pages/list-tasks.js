@@ -21,7 +21,7 @@ var KTDatatablesServerSide = function () {
             ],
 
             ajax: {
-                url: BASE_URL + '/tasks/list',
+                url: BASE_URL + '/missions/list',
                 type: 'POST',
                 data: {"_token": TOKEN},
             },
@@ -64,7 +64,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="` + BASE_URL + `/tasks/edit_task/` + row.id + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="` + BASE_URL + `/missions/edit_mission/` + row.id + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -72,7 +72,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="` + BASE_URL + `/tasks/delete_task/` + row.id + `" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="` + BASE_URL + `/missions/delete_mission/` + row.id + `" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -92,7 +92,7 @@ var KTDatatablesServerSide = function () {
                     targets: 2,
                     render: function (data, type, row) {
                         return `
-                            <a href="` + BASE_URL + `/tasks/view_task/` + row.id + `" class="text-gray-800 text-hover-primary mb-1" >`
+                            <a href="` + BASE_URL + `/missions/view_mission/` + row.id + `" class="text-gray-800 text-hover-primary mb-1" >`
                             + data +
                             `</a>
                             <!--end::Menu-->

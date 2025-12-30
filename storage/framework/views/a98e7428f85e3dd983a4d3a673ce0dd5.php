@@ -1,12 +1,11 @@
-@extends('master')
-@section('css')
-    <link href="{{ asset('assets')  }}/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet"
+<?php $__env->startSection('css'); ?>
+    <link href="<?php echo e(asset('assets')); ?>/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet"
           type="text/css"/>
-    <link href="{{ asset('assets')  }}/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet"
+    <link href="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet"
           type="text/css"/>
-    <link href="{{ asset('assets')  }}/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('assets')  }}/css/style.bundle.css" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('assets')  }}/styles/flatpickr.min.css" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets')); ?>/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets')); ?>/css/style.bundle.css" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets')); ?>/styles/flatpickr.min.css" rel="stylesheet" type="text/css"/>
 
     <style>
         /* Enhanced Add Mission Styling - Keeping Original Structure */
@@ -206,17 +205,17 @@
             background: #f8d7da;
         }
     </style>
-@endsection
-@section('role_user', 'Hospital Account')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('role_user', 'Hospital Account'); ?>
 
-@section('main-title')
-    <a href="{{ route('mission.index') }}">Missions</a>
-@endsection
+<?php $__env->startSection('main-title'); ?>
+    <a href="<?php echo e(route('mission.index')); ?>">Missions</a>
+<?php $__env->stopSection(); ?>
 
-@section('sub-title', 'Add New Mission')
+<?php $__env->startSection('sub-title', 'Add New Mission'); ?>
 
-@section('content')
-    {{-- Enhanced Page Header --}}
+<?php $__env->startSection('content'); ?>
+    
     <div class="mb-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-radius: 12px; padding: 1.5rem 2rem; color: white; box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
@@ -230,7 +229,7 @@
                 <p style="font-size: 0.95rem; opacity: 0.9; margin: 0.25rem 0 0 0;">Fill in the details to create a new medical mission</p>
             </div>
             <div>
-                <a href="{{ route('mission.index') }}" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <a href="<?php echo e(route('mission.index')); ?>" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
                     <i class="ki-duotone ki-arrow-left fs-4">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -246,9 +245,9 @@
         <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general" role="tab-panel">
             <div class="d-flex flex-column gap-7 gap-lg-10">
                 <!--begin::General options-->
-                <form action="{{route('mission.store') }}" class="form mb-15" method="post"
+                <form action="<?php echo e(route('mission.store')); ?>" class="form mb-15" method="post"
                       id="kt_careers_form">
-                    @csrf
+                    <?php echo csrf_field(); ?>
                     <!--begin::Input group-->
                     <div class="card card-flush py-4">
 
@@ -271,20 +270,27 @@
                                         name="specialization" data-control="select2"
                                         class="form-select form-select-solid">
                                     <option value="">Select your specialization</option>
-                                    @if(count($targets) >0)
-                                        @foreach($targets as $target)
-                                            {{--                                            <option value="{{$target->id}}" {{ old('specialization') === $target->id ? 'selected' : '' }}>{{$target->name}}</option>--}}
+                                    <?php if(count($targets) >0): ?>
+                                        <?php $__currentLoopData = $targets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            
 
                                             <option
-                                                value="{{$target->id}}" {{ old('specialization') ==$target->id? "selected" :""}}>{{$target->name}}</option>
-                                        @endforeach
-                                    @endif
+                                                value="<?php echo e($target->id); ?>" <?php echo e(old('specialization') ==$target->id? "selected" :""); ?>><?php echo e($target->name); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php endif; ?>
                                 </select>
                                 <!--end::Select-->
                             </div>
-                            @error('specialization')
-                            <li class="alert alert-danger">{{ $message }}</li>
-                            @enderror
+                            <?php $__errorArgs = ['specialization'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <li class="alert alert-danger"><?php echo e($message); ?></li>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             <!--end::Input group-->
                             <div class="row mb-5">
                                 <!--begin::Col-->
@@ -294,13 +300,20 @@
                                         Person</label>
                                     <!--end::Label-->
                                     <!--begin::Input-->
-                                    <input required value="{{old('contact_name')}}" type="text"
+                                    <input required value="<?php echo e(old('contact_name')); ?>" type="text"
                                            class="form-control form-control-solid"
                                            placeholder="Contact Name" name="contact_name"/>
                                     <!--end::Input-->
-                                    @error('contact_name')
-                                    <li class="alert alert-danger">{{ $message }}</li>
-                                    @enderror
+                                    <?php $__errorArgs = ['contact_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
                                 <!--end::Col-->
 
@@ -311,12 +324,19 @@
                                         Phone</label>
                                     <!--end::Label-->
                                     <!--end::Input-->
-                                    <input value="{{old('contact_phone')}}" class="form-control form-control-solid"
+                                    <input value="<?php echo e(old('contact_phone')); ?>" class="form-control form-control-solid"
                                            placeholder="Contact Phone" name="contact_phone"/>
                                     <!--end::Input-->
-                                    @error('contact_phone')
-                                    <li class="alert alert-danger">{{ $message }}</li>
-                                    @enderror
+                                    <?php $__errorArgs = ['contact_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
 
                                 <!--end::Col-->
@@ -337,19 +357,26 @@
                                 <select required name="specialization_target" data-control="select2"
                                         class="form-select form-select-solid">
                                     <option value="">Select your specialization</option>
-                                    @if(count($targets) >0)
-                                        @foreach($targets as $target)
+                                    <?php if(count($targets) >0): ?>
+                                        <?php $__currentLoopData = $targets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <option
-                                                value="{{$target->id}}" {{ old('specialization_target') ==$target->id? "selected" :""}}>{{$target->name}}</option>
+                                                value="<?php echo e($target->id); ?>" <?php echo e(old('specialization_target') ==$target->id? "selected" :""); ?>><?php echo e($target->name); ?></option>
 
-                                        @endforeach
-                                    @endif
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php endif; ?>
                                 </select>
                                 <!--end::Select-->
                             </div>
-                            @error('specialization_target')
-                            <li class="alert alert-danger">{{ $message }}</li>
-                            @enderror
+                            <?php $__errorArgs = ['specialization_target'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <li class="alert alert-danger"><?php echo e($message); ?></li>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             <!--end::Input group-->
                             <!--begin::Input group-->
                             <div class="row row-cols-lg-2 g-10">
@@ -361,15 +388,22 @@
                                         <!--end::Label-->
                                         <!--begin::Input-->
                                         <input required type="date" class="form-control form-control-solid"
-                                               name="start_date" value="{{old("start_date")}}"
+                                               name="start_date" value="<?php echo e(old("start_date")); ?>"
                                                placeholder="select the start period date"
                                                id="start_date"/>
                                         <!--end::Input-->
                                     </div>
                                 </div>
-                                @error('start_date')
-                                <li class="alert alert-danger">{{ $message }}</li>
-                                @enderror
+                                <?php $__errorArgs = ['start_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 <div class="col" data-kt-calendar="datepicker">
                                     <div class="fv-row mb-9">
                                         <!--begin::Label-->
@@ -378,14 +412,21 @@
                                         <!--begin::Input-->
 
                                         <input required class="form-control form-control-solid"
-                                               name="end_date" value="{{old("end_date")}}"
+                                               name="end_date" value="<?php echo e(old("end_date")); ?>"
                                                placeholder="select the end period date"
                                                id="end_date"/>
                                         <!--end::Input-->
                                     </div>
-                                    @error('end_date')
-                                    <li class="alert alert-danger">{{ $message }}</li>
-                                    @enderror
+                                    <?php $__errorArgs = ['end_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
                             </div>
                             <!--end::Input group-->
@@ -416,11 +457,11 @@
                                                             data-control="select2"
                                                             required>
                                                             <option value="">Select type...</option>
-                                                            @if(count($human_types) >0)
-                                                                @foreach($human_types as $human_type)
-                                                                    <option value="{{$human_type->id}}">{{$human_type->name}}</option>
-                                                                @endforeach
-                                                            @endif
+                                                            <?php if(count($human_types) >0): ?>
+                                                                <?php $__currentLoopData = $human_types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $human_type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <option value="<?php echo e($human_type->id); ?>"><?php echo e($human_type->name); ?></option>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                            <?php endif; ?>
                                                         </select>
                                                     </div>
 
@@ -544,11 +585,11 @@
                                                         data-control="select2"
                                                         required>
                                                         <option value="">Select requirement...</option>
-                                                        @if(count($requirements) >0)
-                                                            @foreach($requirements as $requirement)
-                                                                <option value="{{$requirement->id}}">{{$requirement->name}}</option>
-                                                            @endforeach
-                                                        @endif
+                                                        <?php if(count($requirements) >0): ?>
+                                                            <?php $__currentLoopData = $requirements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $requirement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <option value="<?php echo e($requirement->id); ?>"><?php echo e($requirement->name); ?></option>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                        <?php endif; ?>
                                                     </select>
                                                 </div>
 
@@ -634,7 +675,7 @@
                                         (Optional)</label>
                                     <textarea class="form-control form-control-solid" rows="1"
                                               name="recommendation_team"
-                                              placeholder="">{{old('recommendation_team')}}</textarea>
+                                              placeholder=""><?php echo e(old('recommendation_team')); ?></textarea>
                                 </div>
                                 <!--end::Input group-->
                                 <!--begin::Input group-->
@@ -643,7 +684,7 @@
                                         (Optional)</label>
                                     <textarea class="form-control form-control-solid" rows="1"
                                               name="recommendation_doctor"
-                                              placeholder="">{{old('recommendation_doctor')}}</textarea>
+                                              placeholder=""><?php echo e(old('recommendation_doctor')); ?></textarea>
                                 </div>
                                 <!--end::Input group-->
                                 <!--begin::Separator-->
@@ -674,14 +715,16 @@
         </div>
         <!--end::Tab pane-->
     </div>
-@endsection
-@section('script')
-    <script src="{{ asset('assets')}}/plugins/custom/formrepeater/formrepeater.bundle.js"></script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(asset('assets')); ?>/plugins/custom/formrepeater/formrepeater.bundle.js"></script>
+<?php $__env->stopSection(); ?>
 
-@section('js')
-    <script src="{{ asset('assets')  }}/javascript/pages/add-task.js"></script>
-@endsection
+<?php $__env->startSection('js'); ?>
+    <script src="<?php echo e(asset('assets')); ?>/javascript/pages/add-task.js"></script>
+<?php $__env->stopSection(); ?>
 
 
 <!--end::Custom Javascript-->
+
+<?php echo $__env->make('master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/task/add.blade.php ENDPATH**/ ?>

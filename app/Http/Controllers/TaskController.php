@@ -125,7 +125,7 @@ class TaskController extends Controller
 
         }
 
-        return redirect('/tasks/')->with('message', 'Your data has been saved successfully!');
+        return redirect('/missions/')->with('message', 'Your data has been saved successfully!');
         // dd($task->load('medicalNeeds'));
 
     }
@@ -232,7 +232,7 @@ class TaskController extends Controller
         }
 
 
-        return redirect('/tasks/')->with('message_edit', 'Your data has been saved successfully!');
+        return redirect('/missions/')->with('message_edit', 'Your data has been saved successfully!');
 
     }
 
@@ -247,7 +247,7 @@ class TaskController extends Controller
 
         if ($delete_task) {
 
-            return redirect('/tasks/')->with('message_delete', 'The task has been deleted successfully!');
+            return redirect('/missions/')->with('message_delete', 'The task has been deleted successfully!');
 
         }
     }
@@ -267,7 +267,7 @@ class TaskController extends Controller
         $task->save();
 
 //        return response()->json(['message' => 'Task status updated successfully!']);
-        return redirect('tasks/view_task/' . $id)->with('message', 'Task status updated successfully!');
+        return redirect('missions/view_mission/' . $id)->with('message', 'Task status updated successfully!');
 
     }
 
@@ -305,7 +305,7 @@ class TaskController extends Controller
         Publication::create($publication);
 
 //        return response()->json(['message' => 'Task status updated successfully!']);
-        return redirect('tasks/view_task/' . $id)->with('message', 'Task status updated successfully!');
+        return redirect('missions/view_mission/' . $id)->with('message', 'Task status updated successfully!');
 
     }
 

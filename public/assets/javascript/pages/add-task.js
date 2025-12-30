@@ -44,7 +44,7 @@ var lastday = function (y, m) {
 //
 //
 //     $.ajax({
-//         url: BASE_URL + '/tasks/get_specialization',
+//         url: BASE_URL + '/missions/get_specialization',
 //         data : {'HUMAN_TYPE':human_type, "_token": TOKEN},
 //         type: "POST",
 //         dataType: 'json',
@@ -93,7 +93,7 @@ $(document).on('change', '.need-human-type', function () {
     if (selectedValue) {
         $.ajax({
             type: 'POST',
-            url: BASE_URL + '/tasks/get_specialization',
+            url: BASE_URL + '/missions/get_specialization',
             data: {'HUMAN_TYPE': selectedValue, "_token": TOKEN},
             dataType: 'json',
             success: function (result) {

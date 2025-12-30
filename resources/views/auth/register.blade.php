@@ -17,7 +17,7 @@
             <div class="d-flex flex-center flex-lg-start flex-column">
                 <!--begin::Logo-->
                 <a href="index.html" class="mb-7">
-                    <img alt="Logo"  class="h-100px h-lg-120px theme-light-show"  src="assets/images/logos/moh.jpg" />
+                    <img alt="Logo"  class="h-100px h-lg-150px theme-light-show"  src="assets/images/logos/logo.svg" />
                 </a>
                 <!--end::Logo-->
                 <!--begin::Title-->

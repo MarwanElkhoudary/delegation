@@ -1,7 +1,5 @@
-@extends('master')
-
-@section('css')
-    <link href="{{ asset('assets') }}/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+<?php $__env->startSection('css'); ?>
+    <link href="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
     <style>
         /* ============================================
            ENHANCED VIEW MISSION PAGE - RESPONSIVE
@@ -454,34 +452,34 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@php
+<?php
     $userRole = Auth::user()->role_id;
     $canEditDelete = $userRole == 1 && $task->status && $task->status->name === 'Recently';
     $canUpdateStatus = in_array($userRole, [2, 3]);
-@endphp
+?>
 
-@section('role_user')
-    @if($userRole == 1)
+<?php $__env->startSection('role_user'); ?>
+    <?php if($userRole == 1): ?>
         Hospital Account
-    @elseif($userRole == 2)
+    <?php elseif($userRole == 2): ?>
         General Administration
-    @else
+    <?php else: ?>
         International Cooperation
-    @endif
-@endsection
+    <?php endif; ?>
+<?php $__env->stopSection(); ?>
 
-@section('main-title')
-    <a href="{{ route('mission.index') }}">Missions</a>
-@endsection
+<?php $__env->startSection('main-title'); ?>
+    <a href="<?php echo e(route('mission.index')); ?>">Missions</a>
+<?php $__env->stopSection(); ?>
 
-@section('sub-title', 'Mission Details')
+<?php $__env->startSection('sub-title', 'Mission Details'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-    {{-- Success Messages --}}
-    @if (session('message'))
+    
+    <?php if(session('message')): ?>
         <div class="alert alert-success alert-dismissible fade show d-flex align-items-center p-4 mb-4" role="alert" style="border-radius: 12px; border-left: 4px solid #28a745;">
             <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4">
                 <span class="path1"></span>
@@ -489,13 +487,13 @@
             </i>
             <div class="flex-grow-1">
                 <h5 class="mb-1 text-success">Success!</h5>
-                <span>{{ session('message') }}</span>
+                <span><?php echo e(session('message')); ?></span>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Page Header --}}
+    
     <div class="mission-view-header">
         <div class="mission-view-header-content">
             <div class="mission-title-section">
@@ -504,20 +502,22 @@
                         <span class="path1"></span>
                         <span class="path2"></span>
                     </i>
-                    Mission ID: #{{ $task->id }}
+                    Mission ID: #<?php echo e($task->id); ?>
+
                 </div>
-                <h1 class="mission-main-title">{{ $task->target ? $task->target->name : 'Mission Details' }}</h1>
+                <h1 class="mission-main-title"><?php echo e($task->target ? $task->target->name : 'Mission Details'); ?></h1>
                 <p class="mission-subtitle">
                     <i class="ki-duotone ki-geolocation fs-6 me-1">
                         <span class="path1"></span>
                         <span class="path2"></span>
                     </i>
-                    {{ $task->requestTarget ? $task->requestTarget->name : 'N/A' }}
+                    <?php echo e($task->requestTarget ? $task->requestTarget->name : 'N/A'); ?>
+
                 </p>
             </div>
 
             <div class="mission-actions">
-                <a href="{{ route('mission.index') }}" class="action-btn-header back">
+                <a href="<?php echo e(route('mission.index')); ?>" class="action-btn-header back">
                     <i class="ki-duotone ki-arrow-left fs-4">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -525,13 +525,13 @@
                     Back to List
                 </a>
 
-                @if($userRole == 1)
-                    <a href="{{ url('/missions/edit_mission/' . $task->id) }}"
-                       class="action-btn-header edit {{ !$canEditDelete ? 'disabled' : '' }}"
-                       @if(!$canEditDelete)
+                <?php if($userRole == 1): ?>
+                    <a href="<?php echo e(url('/missions/edit_mission/' . $task->id)); ?>"
+                       class="action-btn-header edit <?php echo e(!$canEditDelete ? 'disabled' : ''); ?>"
+                       <?php if(!$canEditDelete): ?>
                            data-bs-toggle="tooltip"
                        title="Cannot edit - Status is not Recently"
-                        @endif>
+                        <?php endif; ?>>
                         <i class="ki-duotone ki-notepad-edit fs-4">
                             <span class="path1"></span>
                             <span class="path2"></span>
@@ -539,14 +539,14 @@
                         Edit Mission
                     </a>
 
-                    <a href="{{ url('/missions/delete_mission/' . $task->id) }}"
-                       class="action-btn-header delete {{ !$canEditDelete ? 'disabled' : '' }}"
-                       @if($canEditDelete)
+                    <a href="<?php echo e(url('/missions/delete_mission/' . $task->id)); ?>"
+                       class="action-btn-header delete <?php echo e(!$canEditDelete ? 'disabled' : ''); ?>"
+                       <?php if($canEditDelete): ?>
                            onclick="return confirm('Are you sure you want to delete this mission?');"
-                       @else
+                       <?php else: ?>
                            data-bs-toggle="tooltip"
                        title="Cannot delete - Status is not Recently"
-                        @endif>
+                        <?php endif; ?>>
                         <i class="ki-duotone ki-trash fs-4">
                             <span class="path1"></span>
                             <span class="path2"></span>
@@ -556,12 +556,12 @@
                         </i>
                         Delete
                     </a>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    {{-- Mission Information Card --}}
+    
     <div class="mission-info-card">
         <div class="mission-card-header">
             <h3 class="mission-card-title">
@@ -576,7 +576,7 @@
 
         <div class="mission-card-body">
             <div class="info-grid">
-                @if(in_array($userRole, [2, 3]))
+                <?php if(in_array($userRole, [2, 3])): ?>
                     <div class="info-item">
                         <div class="info-label">
                             <i class="ki-duotone ki-hospital fs-5">
@@ -586,10 +586,10 @@
                             Hospital
                         </div>
                         <div class="info-value">
-                            <span class="badge-enhanced badge-status">{{ $task->hospital ? $task->hospital->name : 'N/A' }}</span>
+                            <span class="badge-enhanced badge-status"><?php echo e($task->hospital ? $task->hospital->name : 'N/A'); ?></span>
                         </div>
                     </div>
-                @endif
+                <?php endif; ?>
 
                 <div class="info-item">
                     <div class="info-label">
@@ -599,7 +599,7 @@
                         </i>
                         Specialization
                     </div>
-                    <div class="info-value">{{ $task->target ? $task->target->name : 'N/A' }}</div>
+                    <div class="info-value"><?php echo e($task->target ? $task->target->name : 'N/A'); ?></div>
                 </div>
 
                 <div class="info-item">
@@ -611,13 +611,14 @@
                         Priority
                     </div>
                     <div class="info-value">
-                        @php
+                        <?php
                             $priority = strtolower($task->priority);
                             $priorityClass = "badge-priority-{$priority}";
                             $priorityIcon = $priority === 'high' ? '🔴' : ($priority === 'medium' ? '🟠' : '🟢');
-                        @endphp
-                        <span class="badge-enhanced {{ $priorityClass }}">
-                        {{ $priorityIcon }} {{ strtoupper($priority) }}
+                        ?>
+                        <span class="badge-enhanced <?php echo e($priorityClass); ?>">
+                        <?php echo e($priorityIcon); ?> <?php echo e(strtoupper($priority)); ?>
+
                     </span>
                     </div>
                 </div>
@@ -631,14 +632,14 @@
                         Status
                     </div>
                     <div class="info-value">
-                        @if($task->status)
-                            @php
+                        <?php if($task->status): ?>
+                            <?php
                                 $statusClass = 'badge-status ' . strtolower(str_replace(' ', '-', $task->status->name));
-                            @endphp
-                            <span class="badge-enhanced {{ $statusClass }}">{{ $task->status->name }}</span>
-                        @else
+                            ?>
+                            <span class="badge-enhanced <?php echo e($statusClass); ?>"><?php echo e($task->status->name); ?></span>
+                        <?php else: ?>
                             <span class="badge-enhanced badge-status">N/A</span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -650,7 +651,7 @@
                         </i>
                         Target Location
                     </div>
-                    <div class="info-value">{{ $task->requestTarget ? $task->requestTarget->name : 'N/A' }}</div>
+                    <div class="info-value"><?php echo e($task->requestTarget ? $task->requestTarget->name : 'N/A'); ?></div>
                 </div>
 
                 <div class="info-item">
@@ -663,7 +664,8 @@
                     </div>
                     <div class="info-value">
                     <span class="badge-enhanced" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white;">
-                        {{ $task->start_date }}
+                        <?php echo e($task->start_date); ?>
+
                     </span>
                     </div>
                 </div>
@@ -678,7 +680,8 @@
                     </div>
                     <div class="info-value">
                     <span class="badge-enhanced" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;">
-                        {{ $task->end_date }}
+                        <?php echo e($task->end_date); ?>
+
                     </span>
                     </div>
                 </div>
@@ -691,7 +694,7 @@
                         </i>
                         Contact Person
                     </div>
-                    <div class="info-value">{{ $task->contact_name }}</div>
+                    <div class="info-value"><?php echo e($task->contact_name); ?></div>
                 </div>
 
                 <div class="info-item">
@@ -703,8 +706,9 @@
                         Contact Phone
                     </div>
                     <div class="info-value">
-                        <a href="tel:{{ $task->contact_phone }}" style="color: #1e3c72; font-weight: 600;">
-                            {{ $task->contact_phone }}
+                        <a href="tel:<?php echo e($task->contact_phone); ?>" style="color: #1e3c72; font-weight: 600;">
+                            <?php echo e($task->contact_phone); ?>
+
                         </a>
                     </div>
                 </div>
@@ -717,13 +721,13 @@
                         </i>
                         Created At
                     </div>
-                    <div class="info-value">{{ $task->created_at->format('d/m/Y H:i') }}</div>
+                    <div class="info-value"><?php echo e($task->created_at->format('d/m/Y H:i')); ?></div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Medical Team Card --}}
+    
     <div class="mission-info-card">
         <div class="mission-card-header">
             <h3 class="mission-card-title">
@@ -735,18 +739,18 @@
                     <span class="path5"></span>
                 </i>
                 Medical Team Requirements
-                @if(count($task->medicalNeeds) > 0)
+                <?php if(count($task->medicalNeeds) > 0): ?>
                     <span class="badge-enhanced" style="background: #1e3c72; color: white; font-size: 0.9rem;">
-                    {{ count($task->medicalNeeds) }} Doctors
+                    <?php echo e(count($task->medicalNeeds)); ?> Doctors
                 </span>
-                @endif
+                <?php endif; ?>
             </h3>
         </div>
 
         <div class="mission-card-body">
-            @if(count($task->medicalNeeds) > 0)
+            <?php if(count($task->medicalNeeds) > 0): ?>
                 <div class="team-list">
-                    @foreach($task->medicalNeeds as $index => $doctor)
+                    <?php $__currentLoopData = $task->medicalNeeds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $doctor): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="team-member">
                             <div class="team-member-header">
                                 <div class="team-member-name">
@@ -757,17 +761,18 @@
                                         <span class="path4"></span>
                                         <span class="path5"></span>
                                     </i>
-                                    Doctor #{{ $index + 1 }}
+                                    Doctor #<?php echo e($index + 1); ?>
+
                                 </div>
-                                @if($doctor->priority === 'critical')
+                                <?php if($doctor->priority === 'critical'): ?>
                                     <span class="team-member-badge" style="background: #dc3545; color: white;">
                                 Critical
                             </span>
-                                @else
+                                <?php else: ?>
                                     <span class="team-member-badge">
                                 Not Critical
                             </span>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <div class="team-member-details">
@@ -776,7 +781,8 @@
                                         <span class="path1"></span>
                                         <span class="path2"></span>
                                     </i>
-                                    <strong>Specialization:</strong> {{ $doctor->target ? $doctor->target->name : 'N/A' }}
+                                    <strong>Specialization:</strong> <?php echo e($doctor->target ? $doctor->target->name : 'N/A'); ?>
+
                                 </div>
 
                                 <div class="team-detail-item">
@@ -784,10 +790,10 @@
                                         <span class="path1"></span>
                                         <span class="path2"></span>
                                     </i>
-                                    <strong>Experience:</strong> {{ $doctor->year_of_experience }} Years
+                                    <strong>Experience:</strong> <?php echo e($doctor->year_of_experience); ?> Years
                                 </div>
 
-                                @if($doctor->description)
+                                <?php if($doctor->description): ?>
                                     <div class="team-detail-item" style="grid-column: 1 / -1;">
                                         <i class="ki-duotone ki-note-2">
                                             <span class="path1"></span>
@@ -795,14 +801,15 @@
                                             <span class="path3"></span>
                                             <span class="path4"></span>
                                         </i>
-                                        <strong>Notes:</strong> {{ $doctor->description }}
+                                        <strong>Notes:</strong> <?php echo e($doctor->description); ?>
+
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
-            @else
+            <?php else: ?>
                 <div class="empty-state">
                     <i class="ki-duotone ki-user-square empty-state-icon">
                         <span class="path1"></span>
@@ -812,12 +819,12 @@
                     <h4 class="empty-state-title">No Team Members</h4>
                     <p class="empty-state-text">No medical team requirements have been specified for this mission.</p>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
-    {{-- Additional Requirements Card --}}
-    @if(isset($task->requirementNeeds) && count($task->requirementNeeds) > 0)
+    
+    <?php if(isset($task->requirementNeeds) && count($task->requirementNeeds) > 0): ?>
         <div class="mission-info-card">
             <div class="mission-card-header">
                 <h3 class="mission-card-title">
@@ -828,7 +835,7 @@
                     </i>
                     Additional Requirements
                     <span class="badge-enhanced" style="background: #1e3c72; color: white; font-size: 0.9rem;">
-                {{ count($task->requirementNeeds) }} Items
+                <?php echo e(count($task->requirementNeeds)); ?> Items
             </span>
                 </h3>
             </div>
@@ -865,27 +872,30 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($task->requirementNeeds as $index => $item)
+                        <?php $__currentLoopData = $task->requirementNeeds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr style="border-bottom: 1px solid #f0f2f5; transition: all 0.2s ease;">
                                 <td style="padding: 0.85rem 1rem;">
                                     <div style="display: flex; flex-direction: column; gap: 0.2rem;">
                                         <strong style="color: #3f4254; font-size: 0.95rem;">
-                                            {{ $item->requirement ? $item->requirement->name : 'N/A' }}
+                                            <?php echo e($item->requirement ? $item->requirement->name : 'N/A'); ?>
+
                                         </strong>
-                                        @if($item->category_name)
+                                        <?php if($item->category_name): ?>
                                             <span style="color: #7e8299; font-size: 0.85rem;">
-                                    {{ $item->category_name }}
+                                    <?php echo e($item->category_name); ?>
+
                                 </span>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                                 <td style="padding: 0.85rem 1rem; text-align: center;">
                             <span class="badge-enhanced" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; font-size: 0.9rem; padding: 0.4rem 0.85rem;">
-                                {{ $item->count }}
+                                <?php echo e($item->count); ?>
+
                             </span>
                                 </td>
                                 <td style="padding: 0.85rem 1rem; text-align: center;">
-                                    @if($item->priority === 'critical' || $item->priority === 'Critical')
+                                    <?php if($item->priority === 'critical' || $item->priority === 'Critical'): ?>
                                         <span class="badge-enhanced" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; font-size: 0.8rem;">
                                     <i class="ki-duotone ki-information-3 fs-6">
                                         <span class="path1"></span>
@@ -894,7 +904,7 @@
                                     </i>
                                     Critical
                                 </span>
-                                    @else
+                                    <?php else: ?>
                                         <span class="badge-enhanced" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; font-size: 0.8rem;">
                                     <i class="ki-duotone ki-check-circle fs-6">
                                         <span class="path1"></span>
@@ -902,19 +912,19 @@
                                     </i>
                                     Not Critical
                                 </span>
-                                    @endif
+                                    <?php endif; ?>
                                 </td>
                             </tr>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- Status Update Section (for Admin roles) --}}
-    @if($canUpdateStatus)
+    
+    <?php if($canUpdateStatus): ?>
         <div class="status-update-section">
             <div class="status-update-header">
                 <div class="status-update-icon">
@@ -926,33 +936,34 @@
                 <h4 class="status-update-title">Update Mission Status</h4>
             </div>
 
-            <form action="{{ route('mission.edit_mission_status', $task->id) }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('mission.edit_mission_status', $task->id)); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Mission Status</label>
                         <select name="task_status" class="form-select" required>
-                            @if(count($statuses ?? []) > 0)
-                                @foreach($statuses as $status)
-                                    <option value="{{ $status->id }}"
-                                        {{ old('task_status', $task->status_id) == $status->id ? 'selected' : '' }}>
-                                        {{ $status->name }}
+                            <?php if(count($statuses ?? []) > 0): ?>
+                                <?php $__currentLoopData = $statuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($status->id); ?>"
+                                        <?php echo e(old('task_status', $task->status_id) == $status->id ? 'selected' : ''); ?>>
+                                        <?php echo e($status->name); ?>
+
                                     </option>
-                                @endforeach
-                            @endif
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endif; ?>
                         </select>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Priority</label>
                         <select name="priority" class="form-select" required>
-                            <option value="low" {{ old('priority', strtolower($task->priority)) == 'low' ? 'selected' : '' }}>
+                            <option value="low" <?php echo e(old('priority', strtolower($task->priority)) == 'low' ? 'selected' : ''); ?>>
                                 🟢 LOW
                             </option>
-                            <option value="medium" {{ old('priority', strtolower($task->priority)) == 'medium' ? 'selected' : '' }}>
+                            <option value="medium" <?php echo e(old('priority', strtolower($task->priority)) == 'medium' ? 'selected' : ''); ?>>
                                 🟠 MEDIUM
                             </option>
-                            <option value="high" {{ old('priority', strtolower($task->priority)) == 'high' ? 'selected' : '' }}>
+                            <option value="high" <?php echo e(old('priority', strtolower($task->priority)) == 'high' ? 'selected' : ''); ?>>
                                 🔴 HIGH
                             </option>
                         </select>
@@ -961,7 +972,7 @@
                     <div class="col-12">
                         <label class="form-label fw-bold">Notes (Optional)</label>
                         <textarea name="note" class="form-control" rows="3"
-                                  placeholder="Add any notes or comments about this status update...">{{ old('note', $task->note) }}</textarea>
+                                  placeholder="Add any notes or comments about this status update..."><?php echo e(old('note', $task->note)); ?></textarea>
                     </div>
 
                     <div class="col-12">
@@ -976,11 +987,11 @@
                 </div>
             </form>
         </div>
-    @endif
+    <?php endif; ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
     <script>
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
@@ -994,4 +1005,6 @@
             $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/task/show_task.blade.php ENDPATH**/ ?>

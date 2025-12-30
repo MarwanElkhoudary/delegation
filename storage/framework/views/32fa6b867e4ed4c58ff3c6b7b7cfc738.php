@@ -9,7 +9,7 @@
 <meta property="og:url" content="https://keenthemes.com/metronic" />
 <meta property="og:site_name" content="Metronic by Keenthemes" />
 <link rel="canonical" href="http://preview.keenthemes.comindex.html" />
-<link rel="shortcut icon" href="<?php echo e(asset('assets')); ?>/images/logos/moh.jpg" />
+<link rel="shortcut icon" href="<?php echo e(asset('assets')); ?>/images/logos/logo.svg" />
 <!--begin::Fonts(mandatory for all pages)-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 <!--end::Fonts-->

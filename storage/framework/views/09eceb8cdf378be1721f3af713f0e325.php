@@ -6,8 +6,8 @@
 		<!--end::Logo wrapper-->
 	<!--begin::Logo image-->
 	<a href="?page=index">
-		<img alt="Logo" src="<?php echo e(asset('assets')); ?>/images/logos/moh.jpg" class="h-30px h-lg-40px theme-light-show"/>
-		<img alt="Logo" src="<?php echo e(asset('assets')); ?>/images/logos/moh.jpg" class="h-30px h-lg-40px theme-dark-show"/>
+		<img alt="Logo" src="<?php echo e(asset('assets')); ?>/images/logos/logo.svg" class="h-40px h-lg-60px theme-light-show"/>
+		<img alt="Logo" src="<?php echo e(asset('assets')); ?>/images/logos/logo.svg" class="h-40px h-lg-60px theme-dark-show"/>
 	</a>
 	<!--end::Logo image-->
 </div>

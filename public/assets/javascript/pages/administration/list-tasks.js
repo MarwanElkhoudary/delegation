@@ -21,7 +21,7 @@ var KTDatatablesServerSide = function () {
             ],
 
             ajax: {
-                url: BASE_URL + '/tasks/list',
+                url: BASE_URL + '/missions/list',
                 type:'POST',
                 data : {"_token": TOKEN},
             },
@@ -47,7 +47,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
 
                         return `
-                            <a href="`+ BASE_URL+`/tasks/view_task/`+row.id+`" class="text-gray-800 text-hover-primary mb-1" >`
+                            <a href="`+ BASE_URL+`/missions/view_mission/`+row.id+`" class="text-gray-800 text-hover-primary mb-1" >`
                             +data+
                             `</a>
                             <!--end::Menu-->

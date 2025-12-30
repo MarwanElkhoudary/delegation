@@ -12,9 +12,9 @@
                 </button>
                 <!--end::Logo wrapper-->
                 <!--begin::Logo image-->
-                <a href="<?php echo e(route('task.index')); ?>">
-                    <img alt="Logo"  src="<?php echo e(asset('assets')); ?>/media/logos/default-small.svg" class="h-30px h-lg-40px theme-light-show" />
-                    <img alt="Logo"  src="<?php echo e(asset('assets')); ?>/media/logos/default-small-dark.svg" class="h-30px h-lg-40px theme-dark-show" />
+                <a href="<?php echo e(route('mission.index')); ?>">
+                    <img alt="Logo"  src="<?php echo e(asset('assets')); ?>/images/logos/logo.svg" class="h-40px h-lg-70px theme-light-show" />
+                    <img alt="Logo"  src="<?php echo e(asset('assets')); ?>/images/logos/logo.svg" class="h-40px h-lg-70px theme-dark-show" />
                 </a>
                 <!--end::Logo image-->
             </div>

@@ -1,12 +1,11 @@
-@extends('master')
-@section('css')
-    <link href="{{ asset('assets')  }}/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet"
+<?php $__env->startSection('css'); ?>
+    <link href="<?php echo e(asset('assets')); ?>/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet"
           type="text/css"/>
-    <link href="{{ asset('assets')  }}/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet"
+    <link href="<?php echo e(asset('assets')); ?>/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet"
           type="text/css"/>
-    <link href="{{ asset('assets')  }}/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('assets')  }}/css/style.bundle.css" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('assets')  }}/styles/flatpickr.min.css" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets')); ?>/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets')); ?>/css/style.bundle.css" rel="stylesheet" type="text/css"/>
+    <link href="<?php echo e(asset('assets')); ?>/styles/flatpickr.min.css" rel="stylesheet" type="text/css"/>
 
     <style>
         /* Enhanced Edit Mission Styling - Same as Add Page */
@@ -193,16 +192,16 @@
             box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.1);
         }
     </style>
-@endsection
-@section('role_user', 'Hospital Account')
-@section('main-title')
-    <a href="{{ route('mission.index') }}">Missions</a>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('role_user', 'Hospital Account'); ?>
+<?php $__env->startSection('main-title'); ?>
+    <a href="<?php echo e(route('mission.index')); ?>">Missions</a>
+<?php $__env->stopSection(); ?>
 
-@section('sub-title', 'Edit Mission')
+<?php $__env->startSection('sub-title', 'Edit Mission'); ?>
 
-@section('content')
-    {{-- Enhanced Page Header --}}
+<?php $__env->startSection('content'); ?>
+    
     <div class="mb-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-radius: 12px; padding: 1.5rem 2rem; color: white; box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
@@ -211,12 +210,13 @@
                         <span class="path1"></span>
                         <span class="path2"></span>
                     </i>
-                    Edit Mission #{{ $task->id }}
+                    Edit Mission #<?php echo e($task->id); ?>
+
                 </h1>
                 <p style="font-size: 0.95rem; opacity: 0.9; margin: 0.25rem 0 0 0;">Update mission details and requirements</p>
             </div>
             <div>
-                <a href="{{ route('mission.index') }}" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <a href="<?php echo e(route('mission.index')); ?>" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
                     <i class="ki-duotone ki-arrow-left fs-4">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -232,10 +232,10 @@
         <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general" role="tab-panel">
             <div class="d-flex flex-column gap-7 gap-lg-10">
                 <!--begin::General options-->
-                <form action="{{route('mission.update', [$task->id]) }}" class="form mb-15" method="post"
+                <form action="<?php echo e(route('mission.update', [$task->id])); ?>" class="form mb-15" method="post"
                       id="kt_careers_form">
-                    @csrf
-                    @method('PUT')
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PUT'); ?>
                     <!--begin::Input group-->
                     <div class="card card-flush py-4">
                         <!--begin::Card body-->
@@ -257,18 +257,25 @@
                                         name="specialization" data-control="select2"
                                         class="form-select form-select-solid">
                                     <option value="">Select your specialization</option>
-                                    @if(count($targets) >0)
-                                        @foreach($targets as $target)
+                                    <?php if(count($targets) >0): ?>
+                                        <?php $__currentLoopData = $targets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <option
-                                                value="{{$target->id}}" {{ old('specialization', $task->target_id) == $target->id ? "selected" :""}}>{{$target->name}}</option>
-                                        @endforeach
-                                    @endif
+                                                value="<?php echo e($target->id); ?>" <?php echo e(old('specialization', $task->target_id) == $target->id ? "selected" :""); ?>><?php echo e($target->name); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php endif; ?>
                                 </select>
                                 <!--end::Select-->
                             </div>
-                            @error('specialization')
-                            <li class="alert alert-danger">{{ $message }}</li>
-                            @enderror
+                            <?php $__errorArgs = ['specialization'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <li class="alert alert-danger"><?php echo e($message); ?></li>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             <!--end::Input group-->
                             <div class="row mb-5">
                                 <!--begin::Col-->
@@ -277,13 +284,20 @@
                                     <label class="required fs-5 fw-semibold mb-2">Contact Person</label>
                                     <!--end::Label-->
                                     <!--begin::Input-->
-                                    <input required value="{{old('contact_name', $task->contact_name)}}" type="text"
+                                    <input required value="<?php echo e(old('contact_name', $task->contact_name)); ?>" type="text"
                                            class="form-control form-control-solid"
                                            placeholder="Contact Name" name="contact_name"/>
                                     <!--end::Input-->
-                                    @error('contact_name')
-                                    <li class="alert alert-danger">{{ $message }}</li>
-                                    @enderror
+                                    <?php $__errorArgs = ['contact_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
                                 <!--end::Col-->
 
@@ -293,13 +307,20 @@
                                     <label class="required fs-5 fw-semibold mb-2">Contact Phone</label>
                                     <!--end::Label-->
                                     <!--end::Input-->
-                                    <input value="{{old('contact_phone', $task->contact_phone)}}"
+                                    <input value="<?php echo e(old('contact_phone', $task->contact_phone)); ?>"
                                            class="form-control form-control-solid"
                                            placeholder="Contact Phone" name="contact_phone"/>
                                     <!--end::Input-->
-                                    @error('contact_phone')
-                                    <li class="alert alert-danger">{{ $message }}</li>
-                                    @enderror
+                                    <?php $__errorArgs = ['contact_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
                                 <!--end::Col-->
                             </div>
@@ -319,18 +340,25 @@
                                 <select required name="specialization_target" data-control="select2"
                                         class="form-select form-select-solid">
                                     <option value="">Select your specialization</option>
-                                    @if(count($targets) >0)
-                                        @foreach($targets as $target)
+                                    <?php if(count($targets) >0): ?>
+                                        <?php $__currentLoopData = $targets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $target): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <option
-                                                value="{{$target->id}}" {{ old('specialization_target', $task->request_target_id) == $target->id ? "selected" :""}}>{{$target->name}}</option>
-                                        @endforeach
-                                    @endif
+                                                value="<?php echo e($target->id); ?>" <?php echo e(old('specialization_target', $task->request_target_id) == $target->id ? "selected" :""); ?>><?php echo e($target->name); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php endif; ?>
                                 </select>
                                 <!--end::Select-->
                             </div>
-                            @error('specialization_target')
-                            <li class="alert alert-danger">{{ $message }}</li>
-                            @enderror
+                            <?php $__errorArgs = ['specialization_target'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <li class="alert alert-danger"><?php echo e($message); ?></li>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             <!--end::Input group-->
                             <!--begin::Input group-->
                             <div class="row row-cols-lg-2 g-10">
@@ -341,15 +369,22 @@
                                         <!--end::Label-->
                                         <!--begin::Input-->
                                         <input required type="date" class="form-control form-control-solid"
-                                               name="start_date" value="{{old("start_date",  $task->start_date)}}"
+                                               name="start_date" value="<?php echo e(old("start_date",  $task->start_date)); ?>"
                                                placeholder="select the start period date"
                                                id="start_date"/>
                                         <!--end::Input-->
                                     </div>
                                 </div>
-                                @error('start_date')
-                                <li class="alert alert-danger">{{ $message }}</li>
-                                @enderror
+                                <?php $__errorArgs = ['start_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 <div class="col" data-kt-calendar="datepicker">
                                     <div class="fv-row mb-9">
                                         <!--begin::Label-->
@@ -357,14 +392,21 @@
                                         <!--end::Label-->
                                         <!--begin::Input-->
                                         <input required class="form-control form-control-solid"
-                                               name="end_date" value="{{old("end_date", $task->end_date)}}"
+                                               name="end_date" value="<?php echo e(old("end_date", $task->end_date)); ?>"
                                                placeholder="select the end period date"
                                                id="end_date"/>
                                         <!--end::Input-->
                                     </div>
-                                    @error('end_date')
-                                    <li class="alert alert-danger">{{ $message }}</li>
-                                    @enderror
+                                    <?php $__errorArgs = ['end_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <li class="alert alert-danger"><?php echo e($message); ?></li>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
                             </div>
 
@@ -373,52 +415,52 @@
                                 <div id="medical_needs_repeater">
                                     <div class="form-group">
                                         <div data-repeater-list="medical_needs_list" class="d-flex flex-column gap-3">
-                                            @foreach($task->medicalNeeds as $medicalNeed)
-                                                @php
+                                            <?php $__currentLoopData = $task->medicalNeeds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $medicalNeed): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     // Fetch specializations for this human_type_id
                                                     $specializations = \App\Models\Specialization::where('human_type_id', $medicalNeed->human_type_id)->get();
-                                                @endphp
+                                                ?>
                                                 <div data-repeater-item="" class="form-group">
                                                     <div class="row g-3 align-items-end">
                                                         <!--Human Type-->
                                                         <div class="col-lg-3 col-md-6">
                                                             <label class="form-label fw-semibold">Human Type <span class="text-danger">*</span></label>
                                                             <select class="form-select form-select-solid need-human-type" name="human_type_id" data-placeholder="Select type" data-kt-ecommerce-catalog-add-category="human_type" data-control="select2" required>
-                                                                @if(count($human_types) > 0)
-                                                                    @foreach($human_types as $human_type)
-                                                                        <option value="{{$human_type->id}}" {{ old('human_type_id', $medicalNeed->human_type_id) == $human_type->id ? "selected" : "" }}>{{$human_type->name}}</option>
-                                                                    @endforeach
-                                                                @else
+                                                                <?php if(count($human_types) > 0): ?>
+                                                                    <?php $__currentLoopData = $human_types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $human_type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <option value="<?php echo e($human_type->id); ?>" <?php echo e(old('human_type_id', $medicalNeed->human_type_id) == $human_type->id ? "selected" : ""); ?>><?php echo e($human_type->name); ?></option>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php else: ?>
                                                                     <option value="">No human types available</option>
-                                                                @endif
+                                                                <?php endif; ?>
                                                             </select>
                                                         </div>
 
                                                         <!--Specialization-->
                                                         <div class="col-lg-3 col-md-6">
                                                             <label class="form-label fw-semibold">Specialization <span class="text-danger">*</span></label>
-                                                            <select required class="form-select form-select-solid need-specialization" name="specialization_id" data-placeholder="Select specialization" data-kt-ecommerce-catalog-add-category="Specialization_type" data-control="select2" data-preselected-value="{{ $medicalNeed->specialization_id ?? '' }}">
+                                                            <select required class="form-select form-select-solid need-specialization" name="specialization_id" data-placeholder="Select specialization" data-kt-ecommerce-catalog-add-category="Specialization_type" data-control="select2" data-preselected-value="<?php echo e($medicalNeed->specialization_id ?? ''); ?>">
                                                                 <option value="">Select specialization...</option>
-                                                                @if($specializations->isEmpty())
+                                                                <?php if($specializations->isEmpty()): ?>
                                                                     <option value="">No specializations available</option>
-                                                                @else
-                                                                    @foreach($specializations as $specialization)
-                                                                        <option value="{{$specialization->id}}" {{ $medicalNeed->specialization_id == $specialization->id ? "selected" : "" }}>{{$specialization->name}}</option>
-                                                                    @endforeach
-                                                                @endif
+                                                                <?php else: ?>
+                                                                    <?php $__currentLoopData = $specializations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $specialization): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <option value="<?php echo e($specialization->id); ?>" <?php echo e($medicalNeed->specialization_id == $specialization->id ? "selected" : ""); ?>><?php echo e($specialization->name); ?></option>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php endif; ?>
                                                             </select>
                                                         </div>
 
                                                         <!--Count-->
                                                         <div class="col-lg-2 col-md-6">
                                                             <label class="form-label fw-semibold">Count <span class="text-danger">*</span></label>
-                                                            <input type="number" min="1" required class="form-control form-control-solid" name="count" placeholder="Qty" value="{{old('count', $medicalNeed->count)}}"/>
+                                                            <input type="number" min="1" required class="form-control form-control-solid" name="count" placeholder="Qty" value="<?php echo e(old('count', $medicalNeed->count)); ?>"/>
                                                         </div>
 
                                                         <!--Notes-->
                                                         <div class="col-lg-3 col-md-6">
                                                             <label class="form-label fw-semibold">Notes</label>
-                                                            <input type="text" class="form-control form-control-solid" name="note" placeholder="Enter notes" value="{{old('note', $medicalNeed->note)}}"/>
+                                                            <input type="text" class="form-control form-control-solid" name="note" placeholder="Enter notes" value="<?php echo e(old('note', $medicalNeed->note)); ?>"/>
                                                         </div>
 
                                                         <!--Delete Button-->
@@ -432,7 +474,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </div>
                                     <div class="form-group mt-5">
@@ -458,11 +500,11 @@
                                 <select name="priority" data-control="select2"
                                         data-placeholder="Select priority..."
                                         class="form-select form-select-solid">
-                                    <option value="low" {{ old('priority', $task->priority) == "low" ? "selected" :""}}>🟢 LOW</option>
-                                    <option value="medium" {{ old('priority', $task->priority) == "medium" ? "selected" :""}}>
+                                    <option value="low" <?php echo e(old('priority', $task->priority) == "low" ? "selected" :""); ?>>🟢 LOW</option>
+                                    <option value="medium" <?php echo e(old('priority', $task->priority) == "medium" ? "selected" :""); ?>>
                                         🟠 MEDIUM
                                     </option>
-                                    <option value="high" {{ old('priority', $task->priority) == "high" ? "selected" :""}}>🔴 HIGH
+                                    <option value="high" <?php echo e(old('priority', $task->priority) == "high" ? "selected" :""); ?>>🔴 HIGH
                                     </option>
                                 </select>
                                 <!--end::Select-->
@@ -473,7 +515,7 @@
                                 <div id="additional_requirements_repeater">
                                     <div class="form-group">
                                         <div data-repeater-list="additional_requirements_list" class="d-flex flex-column gap-3">
-                                            @if($task->requirementNeeds->isEmpty())
+                                            <?php if($task->requirementNeeds->isEmpty()): ?>
                                                 <!-- Initialize with an empty item if no requirements exist -->
                                                 <div data-repeater-item="" class="form-group">
                                                     <div class="row g-3 align-items-end">
@@ -481,11 +523,11 @@
                                                             <label class="form-label fw-semibold">Requirement Type <span class="text-danger">*</span></label>
                                                             <select class="form-select form-select-solid" name="requirement_id" data-placeholder="Select requirement" data-kt-ecommerce-catalog-add-category="human_type" data-control="select2" required>
                                                                 <option value="">Select requirement...</option>
-                                                                @if(count($requirements) > 0)
-                                                                    @foreach($requirements as $requirement)
-                                                                        <option value="{{$requirement->id}}">{{$requirement->name}}</option>
-                                                                    @endforeach
-                                                                @endif
+                                                                <?php if(count($requirements) > 0): ?>
+                                                                    <?php $__currentLoopData = $requirements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $requirement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <option value="<?php echo e($requirement->id); ?>"><?php echo e($requirement->name); ?></option>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php endif; ?>
                                                             </select>
                                                         </div>
                                                         <div class="col-lg-3 col-md-6">
@@ -513,34 +555,34 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @else
-                                                @foreach($task->requirementNeeds as $requirementNeed)
+                                            <?php else: ?>
+                                                <?php $__currentLoopData = $task->requirementNeeds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $requirementNeed): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <div data-repeater-item="" class="form-group">
                                                         <div class="row g-3 align-items-end">
                                                             <div class="col-lg-3 col-md-6">
                                                                 <label class="form-label fw-semibold">Requirement Type <span class="text-danger">*</span></label>
                                                                 <select class="form-select form-select-solid" name="requirement_id" data-placeholder="Select requirement" data-kt-ecommerce-catalog-add-category="human_type" data-control="select2" required>
                                                                     <option value="">Select requirement...</option>
-                                                                    @if(count($requirements) > 0)
-                                                                        @foreach($requirements as $requirement)
-                                                                            <option value="{{$requirement->id}}" {{ old('requirement_id', $requirementNeed->requirement_id) == $requirement->id ? "selected" :""}}>{{$requirement->name}}</option>
-                                                                        @endforeach
-                                                                    @endif
+                                                                    <?php if(count($requirements) > 0): ?>
+                                                                        <?php $__currentLoopData = $requirements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $requirement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <option value="<?php echo e($requirement->id); ?>" <?php echo e(old('requirement_id', $requirementNeed->requirement_id) == $requirement->id ? "selected" :""); ?>><?php echo e($requirement->name); ?></option>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                    <?php endif; ?>
                                                                 </select>
                                                             </div>
                                                             <div class="col-lg-3 col-md-6">
                                                                 <label class="form-label fw-semibold">Category Name</label>
-                                                                <input type="text" class="form-control form-control-solid" name="category_name" placeholder="Enter category" value="{{old('category_name', $requirementNeed->category_name)}}"/>
+                                                                <input type="text" class="form-control form-control-solid" name="category_name" placeholder="Enter category" value="<?php echo e(old('category_name', $requirementNeed->category_name)); ?>"/>
                                                             </div>
                                                             <div class="col-lg-2 col-md-6">
                                                                 <label class="form-label fw-semibold">Count <span class="text-danger">*</span></label>
-                                                                <input type="number" min="1" required class="form-control form-control-solid" name="count" placeholder="Qty" value="{{old('count', $requirementNeed->count)}}"/>
+                                                                <input type="number" min="1" required class="form-control form-control-solid" name="count" placeholder="Qty" value="<?php echo e(old('count', $requirementNeed->count)); ?>"/>
                                                             </div>
                                                             <div class="col-lg-3 col-md-6">
                                                                 <label class="form-label fw-semibold">Priority <span class="text-danger">*</span></label>
                                                                 <select class="form-select form-select-solid" name="priority" data-placeholder="Select priority" data-control="select2" required>
-                                                                    <option value="not critical" {{ old('priority', $requirementNeed->priority) == 'not critical' ? 'selected' : '' }}>🟢 Not Critical</option>
-                                                                    <option value="critical" {{ old('priority', $requirementNeed->priority) == 'critical' ? 'selected' : '' }}>🔴 Critical</option>
+                                                                    <option value="not critical" <?php echo e(old('priority', $requirementNeed->priority) == 'not critical' ? 'selected' : ''); ?>>🟢 Not Critical</option>
+                                                                    <option value="critical" <?php echo e(old('priority', $requirementNeed->priority) == 'critical' ? 'selected' : ''); ?>>🔴 Critical</option>
                                                                 </select>
                                                             </div>
                                                             <div class="col-lg-1 col-md-12">
@@ -553,8 +595,8 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
-                                            @endif
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <!-- Removed data-repeater-create button -->
@@ -583,7 +625,7 @@
                                     <label class="fs-6 fw-semibold mb-2">Recommendation Team (Optional)</label>
                                     <textarea class="form-control form-control-solid" rows="1"
                                               name="recommendation_team"
-                                              placeholder="">{{old('recommendation_team', $task->recommendation?->recommendation_team)}}</textarea>
+                                              placeholder=""><?php echo e(old('recommendation_team', $task->recommendation?->recommendation_team)); ?></textarea>
                                 </div>
                                 <!--end::Input group-->
                                 <!--begin::Input group-->
@@ -591,7 +633,7 @@
                                     <label class="fs-6 fw-semibold mb-2">Recommendation Doctor (Optional)</label>
                                     <textarea class="form-control form-control-solid" rows="1"
                                               name="recommendation_doctor"
-                                              placeholder="">{{old('recommendation_doctor', $task->recommendation?->recommendation_doctor)}}</textarea>
+                                              placeholder=""><?php echo e(old('recommendation_doctor', $task->recommendation?->recommendation_doctor)); ?></textarea>
                                 </div>
                                 <!--end::Input group-->
                                 <!--begin::Separator-->
@@ -619,11 +661,13 @@
         </div>
         <!--end::Tab pane-->
     </div>
-@endsection
-@section('script')
-    <script src="{{ asset('assets')}}/plugins/custom/formrepeater/formrepeater.bundle.js"></script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(asset('assets')); ?>/plugins/custom/formrepeater/formrepeater.bundle.js"></script>
+<?php $__env->stopSection(); ?>
 
-@section('js')
-    <script src="{{ asset('assets')  }}/javascript/pages/edit-task.js"></script>
-@endsection
+<?php $__env->startSection('js'); ?>
+    <script src="<?php echo e(asset('assets')); ?>/javascript/pages/edit-task.js"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\work\laragon\www\delegation\resources\views/task/edit_task.blade.php ENDPATH**/ ?>

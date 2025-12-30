@@ -250,8 +250,9 @@
         <div class="login-card">
             <!-- Header -->
             <div class="login-header">
-                <div class="login-icon">
-                    <i class="fas fa-user-md"></i>
+                <!-- Logo Image -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="{{ asset('assets/images/logos/logo.svg') }}" alt="Logo" style="max-width: 200px; height: auto;">
                 </div>
                 <h1>LOGIN</h1>
                 <p>Welcome back! Please login to your account</p>
